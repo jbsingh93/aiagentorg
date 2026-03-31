@@ -11,6 +11,14 @@ argument-hint: "(no arguments — starts interactive alignment conversation)"
 
 Before starting, check if org/config.md exists. If it does, STOP and warn the user: "An organisation already exists (org/config.md found). Running onboarding again would overwrite your existing organisation. If you want to start fresh, delete the org/ directory first. If you want to modify settings, edit org/config.md directly."
 
+**First, greet the user and let them know about /help:**
+
+"Welcome to OrgAgent! I'm going to help you set up your AI agent organisation through a deep alignment conversation.
+
+💡 **Tip:** At any point during this process (or after), you can type `/help` to see all available commands and features, or `/help [topic]` for detailed help on any specific topic.
+
+Let's get started!"
+
 You are about to create a new AI agent organisation from scratch. This is the most important moment in the organisation's life — everything that follows depends on the alignment established here.
 
 ## YOUR ROLE
@@ -1144,6 +1152,8 @@ Optional:
 - Start the dashboard: /dashboard (visual overview at localhost:3000)
 - Schedule background operation: /loop 30m /run-org
 - Check budget anytime: /budget-check
+
+Need help? Type /help to see all commands, or /help [topic] for details on any feature.
 ```
 
 ---
