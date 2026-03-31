@@ -19,8 +19,8 @@ fi
 
 # Check 2: If agent wrote to tasks/, it must also have written to threads/
 if [[ -f "$ACTIVITY_FILE" ]]; then
-  TASK_WRITES=$(grep -c "tasks/" "$ACTIVITY_FILE" 2>/dev/null | grep -c "Write\|create" || echo "0")
-  THREAD_WRITES=$(grep -c "threads/" "$ACTIVITY_FILE" 2>/dev/null | grep -c "Write\|Edit\|update\|append" || echo "0")
+  TASK_WRITES=$(grep -c "tasks/" "$ACTIVITY_FILE" 2>/dev/null || echo "0")
+  THREAD_WRITES=$(grep -c "threads/" "$ACTIVITY_FILE" 2>/dev/null || echo "0")
 
   if [[ "$TASK_WRITES" -gt 0 && "$THREAD_WRITES" -eq 0 ]]; then
     ERRORS="${ERRORS}\n- You modified TASKS but did NOT communicate in any THREAD. Report your task actions in the relevant thread."

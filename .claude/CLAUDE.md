@@ -2,6 +2,21 @@
 
 This file is loaded by Claude Code into every session — both the board (human) and every agent. It tells you how to initialize yourself and operate within this AI agent organisation.
 
+## CRITICAL RULES (ALL sessions, board and agents)
+
+### File System Boundaries
+- `.claude/agents/*.md` are READ-ONLY templates. NEVER modify them during normal operations.
+- ALL runtime changes happen EXCLUSIVELY in `org/`. Agent workspace, tasks, messages, reports, config — everything in `org/`.
+- The ONLY exception: the CAO creating a brand-new agent definition or reconfiguring model/maxTurns.
+
+### Autonomous Operation
+- The organisation runs AUTONOMOUSLY. The human board does NOT manually orchestrate individual agents.
+- `/heartbeat` runs the FULL 4-phase cycle automatically (CEO → Managers → Workers → CAO).
+- Agents MUST NOT ask the user to "run the next agent" or "start the CAO heartbeat." The heartbeat script handles all orchestration.
+- If an agent needs another agent to act, it writes a message in `org/threads/` — the next heartbeat cycle picks it up.
+
+---
+
 ## If You Are an Agent
 
 You are an agent in an AI organisation managed by OrgAgent. To initialize:

@@ -4,10 +4,10 @@ AGENT="${ORGAGENT_CURRENT_AGENT:-board}"
 if [[ "$AGENT" == "board" ]]; then
   exit 0  # Board always allowed
 fi
-# Read agent's remaining budget from overview
-REMAINING=$(grep "$AGENT" org/budgets/overview.md | awk -F'|' '{gsub(/[$[:space:]]/, "", $5); print $5}')
+# Read agent's remaining budget from overview (column 6 = Tilbage/Remaining)
+REMAINING=$(grep "$AGENT" org/budgets/overview.md | awk -F'|' '{gsub(/[$[:space:]]/, "", $6); print $6}')
 if [[ -n "$REMAINING" ]] && awk "BEGIN {exit !($REMAINING <= 0)}" 2>/dev/null; then
-  echo "Budget exhausted for agent: $AGENT. Remaining: \$$REMAINING" >&2
+  echo "Budget exhausted for agent: $AGENT. Remaining: $REMAINING" >&2
   exit 2  # Block
 fi
 exit 0

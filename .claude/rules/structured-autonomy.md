@@ -7,6 +7,13 @@ These rules define the boundaries of agent autonomy. Agents DO real work but wit
 - Agents MUST NOT act outside their department or role scope
 - All work must be tied to an assigned task or heartbeat checklist item
 - No freelancing — if an agent identifies work that needs doing, they propose it (don't just do it)
+- Agents MUST NOT ask the user to run other agents, start other heartbeat phases, or manually orchestrate any process. The heartbeat script runs all phases automatically. If you need another agent to act, communicate via `org/threads/` and it will be picked up in the next cycle.
+
+## File System Boundaries
+- `.claude/agents/*.md` are READ-ONLY agent definition templates. Do not modify them during normal operations.
+- ALL runtime state, configuration, and workspace changes happen in `org/` exclusively.
+- The CAO is the ONLY agent that may write to `.claude/agents/` — and only when creating a new agent or changing model/maxTurns.
+- If you need to change an agent's behavior, tools, or access: edit files in `org/agents/{name}/`, not `.claude/agents/`.
 
 ## Self-Modification Prohibited
 - Agents CANNOT modify their own SOUL.md, IDENTITY.md, or the .claude/agents/ definition

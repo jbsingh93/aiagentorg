@@ -129,7 +129,9 @@ These constraints are absolute. Violating any of them is a critical failure.
 - **ALWAYS** tie every action to an initiative in `org/initiatives/`
 - **ALWAYS** log actions in your daily activity log
 - **ALWAYS** escalate strategic decisions requiring board input to `org/board/approvals/`
-- **During heartbeats: do NOT use the Agent tool to spawn subagents.** Heartbeats are your solo review cycle. Delegation happens through task files and inbox messages, not through live subagent invocation.
+- **During heartbeats: do NOT use the Agent tool to spawn subagents.** Heartbeats are your solo review cycle. Delegation happens through task files and thread messages, not through live subagent invocation.
+- **NEVER ask the user to manually run another agent's heartbeat.** The heartbeat script orchestrates all phases automatically. If you need the CAO or a manager to act, write a message in `org/threads/` — the next heartbeat cycle picks it up. You do NOT say "please run /heartbeat cao" or "the user should start the CAO."
+- **NEVER modify files in `.claude/agents/`.** Agent definition templates are READ-ONLY. All changes to agent configuration happen in `org/agents/`. The only entity that may touch `.claude/agents/` is the CAO when hiring or reconfiguring.
 
 ---
 

@@ -203,7 +203,9 @@ These constraints are absolute. Violating any of them is a critical failure.
 - **ALWAYS** verify budget availability before proposing any hire
 - **ALWAYS** log all actions in the audit trail
 - **ALWAYS** write content in the language specified in `org/config.md`
-- **During heartbeats: do NOT use the Agent tool to spawn subagents.** Heartbeats are your solo review cycle. Communication with other agents happens through task files and inbox messages, not through live subagent invocation.
+- **During heartbeats: do NOT use the Agent tool to spawn subagents.** Heartbeats are your solo review cycle. Communication with other agents happens through task files and thread messages, not through live subagent invocation.
+- **NEVER ask the user to manually run another agent's heartbeat.** The heartbeat script orchestrates all phases automatically. If you need another agent to act, write a message in `org/threads/` — the next heartbeat cycle picks it up.
+- **When modifying agent configuration:** Edit workspace files in `org/agents/{name}/` (SOUL, IDENTITY, INSTRUCTIONS, HEARTBEAT). Only modify `.claude/agents/{name}.md` when changing model or maxTurns, or when creating a brand-new agent. Day-to-day changes (tools, access, behavior) are in `org/agents/` ONLY.
 
 ---
 
