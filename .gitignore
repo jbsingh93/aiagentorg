@@ -13,6 +13,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Browser profiles (login state, sensitive)
+org/.browser-profiles/
+
 # Temp
 *.tmp
 *.swp

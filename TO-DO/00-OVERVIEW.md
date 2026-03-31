@@ -49,7 +49,9 @@ A **dynamic, self-organizing AI agent organisation system** where:
 | 15 | `15-CHAT-LAYER-CHAIN-OF-COMMAND.md` | **NEW** — Chat layer: communication rules, message routing, threading, cross-dept protocol, enforcement hooks, GUI chat view |
 | 16 | `16-OBSERVABILITY-AND-MEMORY-ARCHITECTURE.md` | **NEW** — Three-layer observability: activity streams, current-state tracking, thread-based chat. Hook enforcement for state updates. Complete settings.json |
 | 17 | `17-REMAINING-SKILL-SPECS-AND-MISSING-FILES.md` | **NEW** — 9 missing skill bodies, rules files content, .claude/CLAUDE.md, edge cases, complete settings.json + package.json |
-| 18 | `18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` | **NEW** — Ralph Wiggum Stop-hook pattern for continuous autonomous operation. /run-org, /cancel-org, enhanced Stop hook, stale detection, safety rails |
+| 18 | `18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` | **NEW** — Ralph Wiggum Stop-hook pattern for continuous autonomous operation |
+| 19 | `19-BROWSER-AUTOMATION.md` | **NEW** — Three-tier browser strategy: Playwright MCP (primary), CLI (secondary), Chrome (interactive). Permission integration, /browser skill |
+| 20 | `20-SKILL-LIBRARY-SYSTEM.md` | **NEW** — Custom skill creation, sharing, registry. org/skills/ library, /create-skill meta-skill, versioning, permission integration |
 
 ---
 
@@ -82,7 +84,9 @@ A **dynamic, self-organizing AI agent organisation system** where:
 25. **Hook enforcement of communication** — remind-state-update (periodic), require-state-and-communication (blocks session end)
 26. **Continuous operation (Ralph Wiggum)** — `/run-org` triggers self-sustaining heartbeat loop via Stop hook. Org cycles until quiescent. Board intervenes only for approvals. `/cancel-org` to stop.
 27. **Two operation modes** — Mode A: Continuous (`/run-org`), Mode B: Scheduled wake-up (`/loop 30m /run-org`)
-28. **18 skills total** — +2 new: run-org, cancel-org
+28. **20 system skills total** — +browser, +create-skill
+29. **Browser automation** — Playwright MCP (autonomous headless), Playwright CLI (token-efficient), Claude in Chrome (interactive). Privileged tool — CAO determines access.
+30. **Skill library** — org/skills/ with registry, versioning, sharing, permission-controlled access. CAO/supervisors create skills via /create-skill.
 
 ---
 
@@ -114,7 +118,7 @@ Shared Org State (Markdown files in org/ folder)
 ## Implementation Phases
 
 1. **Foundation** — Project structure, CLAUDE.md, settings.json, rules, package.json
-2. **Skills** — All 18 skill definitions
+2. **Skills** — All 20 system skill definitions
 3. **Core Agents** — CEO + CAO agent definitions
 4. **Scripts** — Heartbeat orchestration + 11 hook scripts (observability, governance, communication)
 5. **GUI Dashboard** — Express.js server + dark-theme SPA with 8 views
