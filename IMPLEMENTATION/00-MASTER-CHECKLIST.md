@@ -42,7 +42,7 @@
 | 5 | GUI Dashboard | 12 | Phases 1-4 | [PHASE-5-GUI.md](PHASE-5-GUI.md) |
 | 6 | Distribution | 3 | Phases 1-5 | [PHASE-6-DISTRIBUTION.md](PHASE-6-DISTRIBUTION.md) |
 | 7 | Testing | 0 (tests) | Phases 1-6 | [PHASE-7-TESTING.md](PHASE-7-TESTING.md) |
-| **Total** | | **~52** | | |
+| **Total** | | **~55** | | |
 
 **Note:** Phases 2, 3, and 4 can be worked on in parallel after Phase 1 is done. Phase 5 requires all prior phases. Phase 6 packages everything. Phase 7 verifies.
 
@@ -76,6 +76,8 @@
 - [ ] `.claude/skills/dashboard/SKILL.md`
 - [ ] `.claude/skills/task/SKILL.md`
 - [ ] master-gpt-prompter — ALREADY EXISTS (verify, do not overwrite)
+- [ ] `.claude/skills/run-org/SKILL.md`
+- [ ] `.claude/skills/cancel-org/SKILL.md`
 
 ### Phase 3: Core Agents
 - [ ] `.claude/agents/ceo.md` — CEO definition
@@ -148,6 +150,10 @@ Which TO-DO doc to read for each component:
 | **CAO skills** | `17` (Part 1) | `12` (permissions), `14` (CAO workspace) |
 | **Agent definitions** | `14` (Steps 2.10-2.12) | `01` (Section 3-4), `10` (format 18) |
 | **Heartbeat script** | `01` (lines 604-714) | `16` (budget update) |
+| **Continuous operation** | `18` (full spec) | `09` (Decisions 38-40) |
+| **run-org skill** | `18` (Section 4.2) | — |
+| **cancel-org skill** | `18` (Section 4.3) | — |
+| **Enhanced Stop hook** | `18` (Section 4.1) | `16` (existing hook) |
 | **Hook scripts** | `16` (Layer 1), `12`, `15`, `01` | `09` (enforcement decisions) |
 | **GUI** | `01` (Section 8) | `10` (all file formats for API parsing) |
 | **Distribution** | `11` (full spec) | — |
@@ -163,7 +169,7 @@ Which TO-DO doc to read for each component:
   settings.json          ← Hooks + permissions (Phase 1)
   rules/                 ← Governance + autonomy (Phase 1)
   agents/ceo.md, cao.md  ← Agent definitions (Phase 3)
-  skills/                ← 16 skills (Phase 2) + existing user skills
+  skills/                ← 18 skills (Phase 2) + existing user skills
 
 org/                     ← Created by /onboard at runtime, NOT during implementation
   alignment.md, config.md, orgchart.md

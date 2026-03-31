@@ -238,7 +238,38 @@
 
 ---
 
-## Task 2.16: master-gpt-prompter — VERIFY ONLY
+## Task 2.16: `/run-org` — Continuous Autonomous Operation
+
+- [ ] **Create file:** `.claude/skills/run-org/SKILL.md`
+- **Spec:** `TO-DO/18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` → Section 4.2 (full SKILL.md provided)
+- **Key content:**
+  - Pre-flight: check org exists, check no overlapping loop
+  - Create `org/.loop-state.md` with iteration counter
+  - Run `bash scripts/heartbeat.sh` (first cycle)
+  - After cycle: assess pending work (unread notifications, pending approvals, recent backlog tasks)
+  - Present approvals to board for decision
+  - If no pending work: output `<promise>ORG_IDLE</promise>`
+  - If pending work: let Stop hook block exit and trigger next cycle
+  - Behavioral rules: NEVER tell user to manually run agents
+- **Dependencies:** Phase 1, heartbeat script (Phase 4), enhanced Stop hook (Phase 4)
+- **Verify:** `/run-org` runs multiple cycles until quiescent
+
+---
+
+## Task 2.17: `/cancel-org` — Stop Continuous Loop
+
+- [ ] **Create file:** `.claude/skills/cancel-org/SKILL.md`
+- **Spec:** `TO-DO/18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` → Section 4.3
+- **Key content:**
+  - Check if `org/.loop-state.md` exists
+  - If yes: read iteration count, delete file, confirm
+  - If no: "No active loop found"
+- **Dependencies:** Phase 1
+- **Verify:** `/cancel-org` stops a running loop
+
+---
+
+## Task 2.18: master-gpt-prompter — VERIFY ONLY
 
 - [ ] **Verify existing file:** `.claude/skills/master-gpt-prompter/SKILL.md` exists and is functional
 - **DO NOT CREATE OR OVERWRITE** — this skill already exists with the user's configuration

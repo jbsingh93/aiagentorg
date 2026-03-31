@@ -26,7 +26,8 @@ Build a **dynamic, self-organizing AI agent organisation** where Claude Code is 
 - `11-DISTRIBUTION-PLAN.md` — packaging and distribution plan
 - `12-DYNAMIC-PERMISSIONS-AND-ACCESS-CONTROL.md` — tool permissions, data access, request workflows
 - `13-MASTER-PROMPTER-SKILL-SPEC.md` — prompt engineering meta-skill (full content)
-- `14-ONBOARDING-SKILL-FULL-SPEC.md` — complete onboarding skill body (TODO)
+- `14-ONBOARDING-SKILL-FULL-SPEC.md` — complete onboarding skill body
+- `18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` — Ralph Wiggum pattern for autonomous continuous operation
 
 **Critical cross-cutting concerns:**
 - **Dynamic tool permissions** — CAO + manager determine tools per agent; agents can REQUEST new tools
@@ -35,6 +36,9 @@ Build a **dynamic, self-organizing AI agent organisation** where Claude Code is 
 - **All prompts optimized** — every LLM-facing text follows the master-gpt-prompter skill principles
 - **Agent Teams** — available for no-brainer cases only; specified in board/executive/CAO context
 - **User custom rules** — collected during onboarding, stored in org/rules/custom-rules.md
+- **Continuous operation** — Ralph Wiggum Stop-hook pattern. `/run-org` triggers self-sustaining loop. Org cycles until quiescent. No manual agent chaining.
+- **`.claude/agents/` is READ-ONLY** — agent definitions are templates. All runtime changes in `org/` only.
+- **No manual orchestration** — agents NEVER ask the user to run other agents. Communication via threads.
 
 ---
 

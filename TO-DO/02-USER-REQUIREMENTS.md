@@ -231,3 +231,31 @@ Decision: PreToolUse hook on Skill tool, checking ORGAGENT_CURRENT_AGENT.
 ### Q: Should Agent Teams be available?
 **A: Yes, but only for exceptional cases**
 > "WE NEED TO BE ABLE TO SPIN UP AGENT TEAMS WHEN NEEDED. BUT THIS HAVE TO BE DONE ONLY WHEN VERY VERY NO-BRAINER CASE."
+
+---
+
+## Q&A Round 5: Testing Observations & Continuous Operation (2026-03-31, post-implementation)
+
+### Observation: Onboarding modified .claude/agents/ instead of org/agents/
+**Fix:** `.claude/agents/` is now READ-ONLY after creation. All runtime changes happen in `org/` only. Hard rules added to governance.md, structured-autonomy.md, and both agent definitions.
+
+### Observation: After /heartbeat ceo, Claude asked to manually start /heartbeat cao
+**Fix:** Agents NEVER ask the user to run other agents. The heartbeat script runs all 4 phases automatically. Communication between agents goes through threads. Hard constraints added to agent definitions.
+
+### Q: How to make it behave like a real organisation that runs continuously?
+**A: Ralph Wiggum pattern**
+> "CANT WE TRIGGER AN INFINITE LOOP VIA HOOKS... LIKE THE RALPH WIGGUM APPROACH"
+
+**Decision:** Use the Ralph Wiggum Stop-hook pattern from Claude Code. One `/run-org` command starts a self-sustaining loop:
+- Heartbeat cycles run automatically until all work is processed
+- The Stop hook checks for pending work after each cycle
+- If work exists → block exit → run another cycle
+- If quiescent → allow exit
+- Board intervenes only for approvals
+- Safety: max 10 cycles per run, stale detection after 3 unchanged cycles
+
+**Two operation modes:**
+- Mode A: `/run-org` — continuous until quiescent
+- Mode B: `/loop 30m /run-org` — scheduled wake-up for fully autonomous operation
+
+**New skills:** `/run-org` (start loop) + `/cancel-org` (stop loop) = 18 total skills

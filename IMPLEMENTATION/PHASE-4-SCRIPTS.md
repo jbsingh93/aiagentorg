@@ -68,19 +68,25 @@
 
 ---
 
-## Task 4.4: `scripts/hooks/require-state-and-communication.sh` — Session End Block
+## Task 4.4: `scripts/hooks/require-state-and-communication.sh` — Session End Block + Ralph Wiggum Loop
 
 - [ ] **Create file:** `scripts/hooks/require-state-and-communication.sh`
-- **Spec:** `TO-DO/16-OBSERVABILITY-AND-MEMORY-ARCHITECTURE.md` → Enforcement Hooks, Hook 3 (full code)
-- **Key content:**
-  - Fires on Stop event
-  - Checks: current-state.md exists and contains today's date
-  - Checks: if agent wrote to tasks/, it must also have written to threads/
-  - Checks: current-state.md status is not "working" or "blocked" (should be "idle" or "completing")
-  - If any check fails: exit 2 (BLOCK) with error message listing what to fix
-  - Board sessions skip
+- **Spec:** `TO-DO/16-OBSERVABILITY-AND-MEMORY-ARCHITECTURE.md` → Hook 3 + `TO-DO/18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` → Section 4.1 (complete enhanced code)
+- **DUAL BEHAVIOR — this is the most complex hook:**
+  - **Part 1 (Agent sessions):** Validates current-state.md updated + thread communication. Blocks if stale.
+  - **Part 2 (Board sessions, org-run mode):** Ralph Wiggum loop logic:
+    - Read `org/.loop-state.md` for iteration count + max
+    - Check for completion promise `<promise>ORG_IDLE</promise>` in Claude's output
+    - Check for pending work: unread notifications, pending approvals, recent backlog tasks
+    - If pending work + under max iterations → block exit with JSON: `{"decision":"block","reason":"..."}`
+    - If quiescent → allow exit, delete loop state file
+    - Stale loop detection: auto-stop if 3 cycles produce no changes
+  - **Part 3 (Board sessions, NOT org-run mode):** Allow exit normally
 - **Dependencies:** None
-- **Verify:** Agent session blocked if state not updated
+- **Verify:** 
+  - Agent session blocked if state not updated (Part 1)
+  - `/run-org` loop continues when work exists (Part 2)
+  - `/run-org` stops when quiescent (Part 2)
 
 ---
 

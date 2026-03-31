@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-31 (Updated continuously)
 **Status:** Final decisions for implementation
-**Total Decisions:** 37
+**Total Decisions:** 40
 
 ---
 
@@ -752,3 +752,51 @@ The `skill-access-check.sh` reads `ORGAGENT_CURRENT_AGENT` and only allows `cao`
 **Enforcement:** A new `message-routing-check.sh` PreToolUse hook validates that every write to an agent's `inbox/` directory follows chain-of-command rules. Workers cannot message the CEO. Cross-department messages must go through managers. Only CEO/board can send urgent messages.
 
 **See:** `15-CHAT-LAYER-CHAIN-OF-COMMAND.md` for complete specification including the communication matrix, message types, threading format, cross-department protocol, enforcement hook implementation, GUI chat view spec, and agent instruction templates.
+
+---
+
+## Decision 38: Continuous Operation via Ralph Wiggum Pattern
+
+**Decision:** Use the Ralph Wiggum Stop-hook pattern for continuous autonomous operation. One `/run-org` command triggers a self-sustaining loop that runs heartbeat cycles until all work is processed.
+
+**How it works:**
+1. User types `/run-org`
+2. Skill creates `org/.loop-state.md` and runs first heartbeat
+3. After each heartbeat, the Stop hook checks: "Is there pending work?"
+4. If YES → block exit with `{"decision":"block","reason":"..."}` → re-inject prompt → another cycle
+5. If NO → allow exit → org is quiescent
+
+**Two operation modes:**
+- **Mode A: Continuous** (`/run-org`) — runs until quiescent
+- **Mode B: Scheduled wake-up** (`/loop 30m /run-org`) — periodic trigger for autonomous operation
+
+**What was eliminated:** External daemon, file watchers, manual agent chaining, Mode 2 (reactive daemon), Mode 3 (multi-round heartbeat) — all replaced by the Ralph pattern.
+
+**Safety rails:** max iterations (default 10), stale detection (auto-stop after 3 unchanged cycles), budget caps, user interrupt (Ctrl+C), `/cancel-org`.
+
+**See:** `18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` for complete specification.
+
+---
+
+## Decision 39: `.claude/agents/` is READ-ONLY After Onboarding
+
+**Decision:** Agent definition files in `.claude/agents/*.md` are created once during onboarding (or CAO hiring) and then treated as READ-ONLY templates. All runtime changes happen exclusively in `org/agents/`.
+
+**Reasoning:** During testing, Claude Code modified `.claude/agents/ceo.md` instead of `org/agents/ceo/INSTRUCTIONS.md`. This causes confusion because the agent definitions are initialization templates — they should not change during normal operations.
+
+**Enforcement:** Rule in governance.md + structured-autonomy.md + hard constraints in CEO/CAO agent definitions. The `require-cao-or-board.sh` hook blocks writes to `.claude/agents/` from non-CAO/board sessions.
+
+**The only exceptions:**
+- CAO creating a brand-new agent definition (hiring)
+- CAO changing model or maxTurns (reconfiguration)
+- Board override
+
+---
+
+## Decision 40: Agents Must Never Request Manual Orchestration
+
+**Decision:** Agents must NEVER ask the user to "run /heartbeat cao" or manually start the next phase. The heartbeat script and Ralph Wiggum loop handle all orchestration automatically. If an agent needs another agent to act, it writes a message in `org/threads/` — the next cycle picks it up.
+
+**Reasoning:** During testing, after running `/heartbeat ceo`, Claude asked the user to manually run `/heartbeat cao`. This defeats the purpose of autonomous operation.
+
+**Enforcement:** Hard constraint in CEO/CAO agent definitions + governance.md "Autonomous Operation" section + structured-autonomy.md mandate rules.

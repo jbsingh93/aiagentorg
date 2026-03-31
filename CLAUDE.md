@@ -41,6 +41,9 @@ Shared Org State (Markdown files in org/)
 6. **Three-layer observability** — Activity stream (hook-forced), current-state.md (agent-maintained, hook-enforced), threads (single source of truth for conversations).
 7. **Agent Teams** — Available ONLY for exceptional no-brainer cases.
 8. **Outbox eliminated** — Thread files are the record. Inbox holds only lightweight notifications.
+9. **Continuous operation (Ralph Wiggum)** — `/run-org` triggers self-sustaining heartbeat loop via Stop hook. Org cycles until quiescent. Board intervenes only for approvals. `/cancel-org` to stop. `/loop 30m /run-org` for fully autonomous background operation.
+10. **`.claude/agents/` is READ-ONLY** — Agent definitions are templates created once. All runtime changes in `org/` only. Exception: CAO hiring/reconfiguring.
+11. **No manual orchestration** — Agents NEVER ask the user to run other agents. Heartbeat script + Ralph loop handle everything. Communication between agents goes through `org/threads/`.
 
 ## .claude/CLAUDE.md — Agent Initialization Guide
 
@@ -54,7 +57,7 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 7. You MUST maintain `activity/current-state.md` — hooks enforce this
 8. You MUST communicate in threads (`org/threads/`) — hooks enforce this
 
-## Skills (16 total)
+## Skills (18 total)
 
 | Skill | Purpose |
 |-------|---------|
@@ -74,6 +77,8 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | dashboard | Start GUI server |
 | task | Task management |
 | master-gpt-prompter | Meta-skill: prompt engineering for all LLM-facing text |
+| run-org | Start continuous autonomous loop (Ralph Wiggum pattern) |
+| cancel-org | Stop the continuous loop cleanly |
 
 ## Hooks (11 total)
 
@@ -104,7 +109,7 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | 06 | CLAUDE-CODE-PERSISTENCE-CLI-RESEARCH.md | CLAUDE.md, memory, settings, CLI |
 | 07 | OPENCLAW-RESEARCH.md | OpenClaw agent architecture (workspace inspiration) |
 | 08 | SCREENSHOT-ANALYSIS.md | Original org chart diagram |
-| 09 | ARCHITECTURE-DECISIONS.md | All 37 design decisions with reasoning |
+| 09 | ARCHITECTURE-DECISIONS.md | All 40 design decisions with reasoning |
 | 10 | FILE-FORMAT-SPECIFICATIONS.md | 26 file format specs with examples |
 | 11 | DISTRIBUTION-PLAN.md | npx create-orgagent packaging |
 | 12 | DYNAMIC-PERMISSIONS-AND-ACCESS-CONTROL.md | Tool permissions, data access, request workflows |
@@ -112,6 +117,8 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | 14 | ONBOARDING-SKILL-FULL-SPEC.md | Complete onboarding skill body (~600 lines) |
 | 15 | CHAT-LAYER-CHAIN-OF-COMMAND.md | Communication rules, routing, threading, cross-dept |
 | 16 | OBSERVABILITY-AND-MEMORY-ARCHITECTURE.md | Three-layer observability, activity streams, current-state, thread chat, 11 hooks |
+| 17 | REMAINING-SKILL-SPECS-AND-MISSING-FILES.md | 9 skill bodies, rules, .claude/CLAUDE.md, edge cases, settings.json |
+| 18 | CONTINUOUS-OPERATION-RALPH-WIGGUM.md | Ralph Wiggum Stop-hook pattern, /run-org, /cancel-org, stale detection |
 
 ## Key Constraints
 

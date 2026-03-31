@@ -300,6 +300,53 @@ claude --version
 - **Expected:** data-access-check.sh BLOCKS the read
 - **Verify:** Error message says "ACCESS DENIED"
 
+### Scenario 15: Continuous Operation (/run-org)
+
+- [ ] **Test:** Type `/run-org`
+- **Expected:** Multiple heartbeat cycles run autonomously. Pending approvals presented to user. Loop ends when quiescent.
+- **Verify:**
+  ```bash
+  # Loop state file created during run
+  # (check DURING the run, not after — it's deleted on exit)
+  
+  # After run: loop state file deleted
+  [ ! -f org/.loop-state.md ] && echo "OK: loop state cleaned up"
+  
+  # Multiple cycles executed (check spending log for multiple entries)
+  wc -l org/budgets/spending-log.md
+  
+  # Activity streams show multiple heartbeat timestamps
+  grep "heartbeat" org/agents/ceo/activity/$(date +%Y-%m-%d).md | wc -l
+  ```
+
+### Scenario 16: Cancel Org Loop
+
+- [ ] **Test:** Start `/run-org`, then type `/cancel-org` during a cycle
+- **Expected:** Loop stops cleanly, state file deleted
+- **Verify:**
+  ```bash
+  [ ! -f org/.loop-state.md ] && echo "OK: loop state cleaned up"
+  ```
+
+### Scenario 17: .claude/agents/ Read-Only Enforcement
+
+- [ ] **Test:** During heartbeat, verify no agent modifies `.claude/agents/*.md`
+- **Expected:** All changes happen in `org/agents/` only
+- **Verify:**
+  ```bash
+  # Check git status — .claude/agents/ should be unchanged after heartbeat
+  git diff --name-only .claude/agents/
+  # Should show NO changes
+  ```
+
+### Scenario 18: No Manual Agent Chaining
+
+- [ ] **Test:** Run `/heartbeat ceo` and check output
+- **Expected:** CEO does NOT say "now run /heartbeat cao" or "please start the CAO"
+- **Verify:** Read the CEO's output — no references to manually running other agents
+
+---
+
 ### EC-5: Unauthorized Skill Use
 
 - [ ] **Test:** A worker agent tries to invoke /hire-agent
