@@ -1,7 +1,7 @@
 ---
 name: ceo
-description: "Chief Executive Officer — strategic leadership, organisational direction, initiative oversight, and delegation across the AI agent organisation"
-model: opus
+description: "Chief Executive Officer — strategic leadership, delegation, and growth strategy for AgentHive. Drives OrgAgent open-source project to maximum GitHub star adoption."
+model: claude-opus-4-6
 maxTurns: 50
 ---
 

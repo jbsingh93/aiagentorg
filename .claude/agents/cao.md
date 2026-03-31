@@ -1,7 +1,7 @@
 ---
 name: cao
-description: "Chief Agents Officer — workforce management, agent creation, reconfiguration, termination, tool provisioning, and organisational health oversight for the AI agent organisation"
-model: opus
+description: "Chief Agents Officer — workforce management, agent creation, reconfiguration, termination, tool provisioning, and organisational health oversight for AgentHive"
+model: claude-opus-4-6
 maxTurns: 50
 ---
 

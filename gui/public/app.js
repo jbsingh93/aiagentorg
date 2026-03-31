@@ -618,11 +618,105 @@
   }
 
   // -------------------------------------------------------------------
-  // Polling
+  // WebSocket — Real-time updates from file watcher
   // -------------------------------------------------------------------
-  function startPolling() {
+  let ws = null;
+  let wsReconnectTimer = null;
+  let wsConnected = false;
+
+  // Map of file-change categories to which panels need refreshing
+  const CATEGORY_PANELS = {
+    threads:    ['threads', 'overview'],
+    tasks:      ['tasks', 'overview'],
+    agents:     ['agents', 'overview', 'orgchart'],
+    budget:     ['budget', 'overview'],
+    audit:      ['activity'],
+    approvals:  ['board', 'overview'],
+    activity:   ['activity', 'agents'],
+    messages:   ['threads'],
+    orgchart:   ['orgchart', 'overview', 'agents'],
+    connectors: ['overview'],
+    skills:     ['overview'],
+    general:    ['overview']
+  };
+
+  function connectWebSocket() {
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${protocol}//${location.host}`);
+
+    ws.onopen = () => {
+      wsConnected = true;
+      console.log('[WS] Connected — real-time updates active');
+      updateConnectionStatus(true);
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'file-change') {
+          const tab = activeTab();
+          const panelsToRefresh = CATEGORY_PANELS[data.category] || ['overview'];
+
+          // Only refresh if the active panel needs it
+          if (panelsToRefresh.includes(tab)) {
+            loadActivePanel();
+          }
+
+          // Always show a subtle flash indicator
+          showChangeIndicator(data);
+        }
+      } catch (e) {
+        console.warn('[WS] Parse error:', e);
+      }
+    };
+
+    ws.onclose = () => {
+      wsConnected = false;
+      console.log('[WS] Disconnected — falling back to polling');
+      updateConnectionStatus(false);
+      // Reconnect after 3 seconds
+      wsReconnectTimer = setTimeout(connectWebSocket, 3000);
+    };
+
+    ws.onerror = () => {
+      ws.close();
+    };
+  }
+
+  function updateConnectionStatus(connected) {
+    const indicator = $('#ws-status');
+    if (indicator) {
+      indicator.className = connected ? 'ws-connected' : 'ws-disconnected';
+      indicator.title = connected ? 'Real-time: connected' : 'Real-time: reconnecting...';
+    }
+  }
+
+  function showChangeIndicator(data) {
+    // Flash the relevant tab to show something changed
+    const tabMap = {
+      threads: 'threads', tasks: 'tasks', agents: 'agents',
+      budget: 'budget', audit: 'activity', approvals: 'board',
+      activity: 'activity', messages: 'threads', orgchart: 'orgchart'
+    };
+    const tabName = tabMap[data.category];
+    if (tabName) {
+      const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+      if (tabBtn && !tabBtn.classList.contains('active')) {
+        tabBtn.classList.add('tab-flash');
+        setTimeout(() => tabBtn.classList.remove('tab-flash'), 1500);
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------
+  // Fallback Polling (only when WebSocket is disconnected)
+  // -------------------------------------------------------------------
+  function startFallbackPolling() {
     setInterval(async () => {
-      await loadActivePanel();
+      if (!wsConnected) {
+        await loadActivePanel();
+      }
     }, POLL_INTERVAL);
   }
 
@@ -641,7 +735,12 @@
     });
 
     loadActivePanel();
-    startPolling();
+
+    // Connect WebSocket for real-time updates
+    connectWebSocket();
+
+    // Fallback polling every 5s (only fires when WS is disconnected)
+    startFallbackPolling();
   }
 
   // Wait for DOM

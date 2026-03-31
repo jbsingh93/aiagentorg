@@ -596,6 +596,49 @@ table.data-table tr:hover td { background: var(--bg-hover); }
 }
 
 /* ===================================================================
+   WEBSOCKET — Connection Status Indicator
+   =================================================================== */
+.ws-connected {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  margin-left: 8px;
+  vertical-align: middle;
+  box-shadow: 0 0 6px var(--accent-green);
+}
+
+.ws-disconnected {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  margin-left: 8px;
+  vertical-align: middle;
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Tab flash when data changes on an inactive tab */
+.tab-flash {
+  animation: tab-notify 1.5s ease-in-out;
+}
+
+@keyframes tab-notify {
+  0%   { background: transparent; }
+  25%  { background: rgba(88, 166, 255, 0.3); }
+  50%  { background: transparent; }
+  75%  { background: rgba(88, 166, 255, 0.2); }
+  100% { background: transparent; }
+}
+
+/* ===================================================================
    SCROLLBAR (webkit)
    =================================================================== */
 ::-webkit-scrollbar { width: 8px; height: 8px; }

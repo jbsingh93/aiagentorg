@@ -10,8 +10,10 @@
     "heartbeat:cao": "bash scripts/heartbeat.sh cao"
   },
   "dependencies": {
+    "chokidar": "^5.0.0",
     "express": "^5.0.0",
+    "gray-matter": "^4.0.3",
     "marked": "^15.0.0",
-    "gray-matter": "^4.0.3"
+    "ws": "^8.20.0"
   }
 }
