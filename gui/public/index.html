@@ -38,6 +38,7 @@
     <button class="tab"        data-tab="budget"    role="tab">Budget</button>
     <button class="tab"        data-tab="board"     role="tab">Board</button>
     <button class="tab"        data-tab="activity"  role="tab">Activity</button>
+    <button class="tab"        data-tab="livefeed"  role="tab">Live Feed</button>
   </nav>
 
   <!-- ================================================================== -->
@@ -192,6 +193,29 @@
           <button class="btn btn-small" id="auditNext">Next &gt;</button>
         </div>
         <div id="auditTable"></div>
+      </div>
+    </section>
+
+    <!-- ---- LIVE FEED ------------------------------------------------- -->
+    <section id="panel-livefeed" class="tab-panel">
+      <div class="card live-feed-card">
+        <div class="live-feed-header">
+          <h2>Live Feed</h2>
+          <div class="live-feed-controls">
+            <label><input type="checkbox" id="feedAutoScroll" checked> Auto-scroll</label>
+            <select id="feedFilter">
+              <option value="all">All agents</option>
+            </select>
+            <button class="btn btn-small" id="feedClear">Clear</button>
+          </div>
+        </div>
+        <div class="live-feed-container" id="liveFeedContainer">
+          <div class="live-feed-empty">Waiting for agent activity... Start a heartbeat or /run-org to see real-time updates.</div>
+        </div>
+        <div class="live-feed-status-bar" id="liveFeedStatusBar">
+          <span id="feedEntryCount">0 entries</span>
+          <span id="feedAgentStatuses"></span>
+        </div>
       </div>
     </section>
 

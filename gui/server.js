@@ -113,11 +113,51 @@ watcher.on('all', (event, filePath) => {
 
   const payload = {
     type: 'file-change',
-    event,           // 'add', 'change', 'unlink', 'addDir', 'unlinkDir'
-    path: rel,       // relative path within org/
-    category,        // 'threads', 'tasks', 'agents', 'budget', 'audit', etc.
+    event,
+    path: rel,
+    category,
     timestamp: new Date().toISOString()
   };
+
+  // For activity stream files: read the LAST entry and include it
+  // so the live feed can display it immediately without re-fetching
+  if (rel.includes('/activity/') && !rel.includes('current-state') && (event === 'change' || event === 'add')) {
+    try {
+      const fs = require('fs');
+      const lines = fs.readFileSync(filePath, 'utf8').split('\n').filter(l => l.startsWith('|') && !l.startsWith('| Time') && !l.startsWith('|---'));
+      const lastLine = lines[lines.length - 1];
+      if (lastLine) {
+        const parts = lastLine.split('|').map(s => s.trim()).filter(Boolean);
+        if (parts.length >= 4) {
+          // Extract agent name from path: agents/{name}/activity/...
+          const agentMatch = rel.match(/agents\/([^/]+)\/activity/);
+          const agent = agentMatch ? agentMatch[1] : 'unknown';
+          payload.type = 'live-activity';
+          payload.agent = agent;
+          payload.time = parts[0];
+          payload.tool = parts[1];
+          payload.action = parts[2];
+          payload.target = parts[3];
+          payload.summary = parts[4] || '';
+        }
+      }
+    } catch (_) { /* ignore read errors */ }
+  }
+
+  // For current-state.md changes: read the status line
+  if (rel.includes('current-state.md') && (event === 'change' || event === 'add')) {
+    try {
+      const fs = require('fs');
+      const content = fs.readFileSync(filePath, 'utf8');
+      const statusMatch = content.match(/^## Status:?\s*(.+)$/m);
+      const agentMatch = rel.match(/agents\/([^/]+)\/activity/);
+      if (statusMatch && agentMatch) {
+        payload.type = 'agent-status';
+        payload.agent = agentMatch[1];
+        payload.status = statusMatch[1].trim();
+      }
+    } catch (_) { /* ignore */ }
+  }
 
   broadcast(payload);
 });

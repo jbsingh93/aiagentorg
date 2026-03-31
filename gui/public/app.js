@@ -618,6 +618,165 @@
   }
 
   // -------------------------------------------------------------------
+  // Live Feed — real-time agent activity terminal
+  // -------------------------------------------------------------------
+  let feedEntries = [];
+  let feedEntryCount = 0;
+  const MAX_FEED_ENTRIES = 500;
+  const agentStatuses = {};
+  const knownAgents = new Set();
+
+  function getAgentClass(agent) {
+    if (agent === 'ceo') return 'agent-ceo';
+    if (agent === 'cao') return 'agent-cao';
+    if (agent.includes('manager')) return 'agent-manager';
+    return 'agent-worker';
+  }
+
+  function highlightPath(target) {
+    return (target || '').replace(/(org\/[^\s|]+)/g, '<span class="path-highlight">$1</span>');
+  }
+
+  function addFeedEntry(data) {
+    const container = $('#liveFeedContainer');
+    if (!container) return;
+
+    // Remove empty placeholder
+    const empty = container.querySelector('.live-feed-empty');
+    if (empty) empty.remove();
+
+    // Track agent
+    if (data.agent) knownAgents.add(data.agent);
+
+    // Create entry element
+    const entry = document.createElement('div');
+
+    if (data.type === 'live-activity') {
+      entry.className = 'live-feed-entry new-entry';
+      entry.innerHTML = `
+        <span class="feed-time">${esc(data.time || '')}</span>
+        <span class="feed-agent ${getAgentClass(data.agent || '')}">${esc(data.agent || '')}</span>
+        <span class="feed-tool">${esc(data.tool || '')}</span>
+        <span class="feed-action">${esc(data.action || '')}</span>
+        <span class="feed-target">${highlightPath(data.target || '')}</span>
+        <span class="feed-summary">${esc(data.summary || '')}</span>
+      `;
+    } else if (data.type === 'agent-status') {
+      entry.className = 'live-feed-entry entry-status new-entry';
+      entry.innerHTML = `
+        <span class="feed-time">${new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
+        <span class="feed-agent ${getAgentClass(data.agent || '')}">${esc(data.agent || '')}</span>
+        <span class="feed-status-text">STATUS: ${esc(data.status || '')}</span>
+      `;
+      agentStatuses[data.agent] = data.status;
+      updateAgentStatusBar();
+    } else if (data.type === 'file-change') {
+      entry.className = 'live-feed-entry new-entry';
+      const agentMatch = (data.path || '').match(/agents\/([^/]+)\//);
+      const agent = agentMatch ? agentMatch[1] : 'system';
+      entry.innerHTML = `
+        <span class="feed-time">${new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
+        <span class="feed-agent ${getAgentClass(agent)}">${esc(agent)}</span>
+        <span class="feed-tool">${esc(data.event || '')}</span>
+        <span class="feed-action">${esc(data.category || '')}</span>
+        <span class="feed-target">${highlightPath(data.path || '')}</span>
+      `;
+    }
+
+    // Apply filter
+    const filter = $('#feedFilter');
+    if (filter && filter.value !== 'all') {
+      const entryAgent = data.agent || '';
+      if (entryAgent !== filter.value) {
+        entry.style.display = 'none';
+      }
+    }
+
+    container.appendChild(entry);
+    feedEntryCount++;
+
+    // Limit entries
+    while (container.children.length > MAX_FEED_ENTRIES) {
+      container.removeChild(container.firstChild);
+    }
+
+    // Auto-scroll
+    const autoScroll = $('#feedAutoScroll');
+    if (autoScroll && autoScroll.checked) {
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Update count
+    const countEl = $('#feedEntryCount');
+    if (countEl) countEl.textContent = feedEntryCount + ' entries';
+
+    // Update agent filter dropdown
+    updateAgentFilter();
+  }
+
+  function updateAgentFilter() {
+    const filter = $('#feedFilter');
+    if (!filter) return;
+    const current = filter.value;
+    const agents = Array.from(knownAgents).sort();
+
+    // Only update if agents changed
+    if (filter.dataset.agents === agents.join(',')) return;
+    filter.dataset.agents = agents.join(',');
+
+    filter.innerHTML = '<option value="all">All agents</option>';
+    for (const agent of agents) {
+      const opt = document.createElement('option');
+      opt.value = agent;
+      opt.textContent = agent;
+      if (agent === current) opt.selected = true;
+      filter.appendChild(opt);
+    }
+  }
+
+  function updateAgentStatusBar() {
+    const bar = $('#feedAgentStatuses');
+    if (!bar) return;
+    bar.innerHTML = Object.entries(agentStatuses).map(([agent, status]) => {
+      const dotClass = status.toLowerCase().includes('working') ? 'working' :
+                       status.toLowerCase().includes('idle') ? 'idle' : 'active';
+      return `<span class="agent-status-chip"><span class="dot ${dotClass}"></span>${esc(agent)}</span>`;
+    }).join('');
+  }
+
+  function initLiveFeed() {
+    const clearBtn = $('#feedClear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        const container = $('#liveFeedContainer');
+        if (container) {
+          container.innerHTML = '<div class="live-feed-empty">Feed cleared. Waiting for new activity...</div>';
+          feedEntryCount = 0;
+          const countEl = $('#feedEntryCount');
+          if (countEl) countEl.textContent = '0 entries';
+        }
+      });
+    }
+
+    const filter = $('#feedFilter');
+    if (filter) {
+      filter.addEventListener('change', () => {
+        const container = $('#liveFeedContainer');
+        if (!container) return;
+        const val = filter.value;
+        for (const entry of container.querySelectorAll('.live-feed-entry')) {
+          if (val === 'all') {
+            entry.style.display = '';
+          } else {
+            const agentEl = entry.querySelector('.feed-agent');
+            entry.style.display = (agentEl && agentEl.textContent === val) ? '' : 'none';
+          }
+        }
+      });
+    }
+  }
+
+  // -------------------------------------------------------------------
   // WebSocket — Real-time updates from file watcher
   // -------------------------------------------------------------------
   let ws = null;
@@ -654,16 +813,23 @@
       try {
         const data = JSON.parse(event.data);
 
-        if (data.type === 'file-change') {
+        if (data.type === 'connected') return;
+
+        // Always feed to Live Feed (regardless of active tab)
+        addFeedEntry(data);
+
+        // Panel refresh logic
+        if (data.type === 'file-change' || data.type === 'live-activity' || data.type === 'agent-status') {
           const tab = activeTab();
-          const panelsToRefresh = CATEGORY_PANELS[data.category] || ['overview'];
+          const category = data.category || 'general';
+          const panelsToRefresh = CATEGORY_PANELS[category] || ['overview'];
 
           // Only refresh if the active panel needs it
           if (panelsToRefresh.includes(tab)) {
             loadActivePanel();
           }
 
-          // Always show a subtle flash indicator
+          // Show flash on inactive tabs
           showChangeIndicator(data);
         }
       } catch (e) {
@@ -735,6 +901,7 @@
     });
 
     loadActivePanel();
+    initLiveFeed();
 
     // Connect WebSocket for real-time updates
     connectWebSocket();
