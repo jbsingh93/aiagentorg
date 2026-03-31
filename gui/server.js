@@ -162,6 +162,46 @@ watcher.on('all', (event, filePath) => {
   broadcast(payload);
 });
 
+// Dedicated watcher for the live feed file — most reliable real-time source
+const liveFeedPath = path.join(orgDir, '.live-feed.log');
+const feedWatcher = chokidar.watch(liveFeedPath, {
+  persistent: true,
+  ignoreInitial: true,
+  awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 50 }
+});
+
+let lastFeedSize = 0;
+feedWatcher.on('change', () => {
+  try {
+    const fs = require('fs');
+    const content = fs.readFileSync(liveFeedPath, 'utf8');
+    const lines = content.trim().split('\n');
+
+    // Only broadcast NEW lines (lines added since last check)
+    const newLines = lines.slice(Math.max(0, lastFeedSize));
+    lastFeedSize = lines.length;
+
+    for (const line of newLines) {
+      const parts = line.split('|').map(s => s.trim()).filter(Boolean);
+      if (parts.length >= 5) {
+        broadcast({
+          type: 'live-activity',
+          timestamp: new Date().toISOString(),
+          time: parts[0],
+          agent: parts[1],
+          tool: parts[2],
+          action: parts[3],
+          target: parts[4],
+          summary: parts[5] || '',
+          category: 'activity'
+        });
+      }
+    }
+  } catch (_) { /* ignore read errors — file may not exist yet */ }
+});
+
+feedWatcher.on('add', () => { lastFeedSize = 0; });
+
 // ---------------------------------------------------------------------------
 // Express Middleware
 // ---------------------------------------------------------------------------

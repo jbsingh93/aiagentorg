@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 # activity-logger.sh — Log every file operation to agent's activity stream + audit log
+# Also writes to a LIVE FEED file that the GUI WebSocket watches for real-time display.
 INPUT=$(cat)
-AGENT="${ORGAGENT_CURRENT_AGENT:-board}"
 ORG_DIR="${ORGAGENT_ORG_DIR:-org}"
-TOOL=$(echo "$INPUT" | jq -r '.tool_name // "unknown"')
+TOOL=$(echo "$INPUT" | jq -r '.tool_name // "unknown"' 2>/dev/null || echo "unknown")
 TODAY=$(date +%Y-%m-%d)
 TIMESTAMP=$(date +%H:%M:%S)
 FULL_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S")
+
+# Determine agent: from env var, OR auto-detect from the session's agent name
+AGENT="${ORGAGENT_CURRENT_AGENT:-}"
+if [[ -z "$AGENT" ]]; then
+  # Try to detect from Claude Code's session context (agent name in tool input paths)
+  TARGET_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // ""' 2>/dev/null)
+  DETECTED=$(echo "$TARGET_PATH" | grep -o 'org/agents/[^/]*' | head -1 | sed 's|org/agents/||')
+  if [[ -n "$DETECTED" && -d "$ORG_DIR/agents/$DETECTED" ]]; then
+    AGENT="$DETECTED"
+  else
+    AGENT="board"
+  fi
+fi
 
 # Determine target and action based on tool type
 case "$TOOL" in
@@ -71,6 +84,18 @@ fi
 AUDIT_FILE="$ORG_DIR/board/audit-log.md"
 if [[ -f "$AUDIT_FILE" ]]; then
   echo "| $FULL_TIMESTAMP | $AGENT | $ACTION | $TARGET | $SUMMARY |" >> "$AUDIT_FILE"
+fi
+
+# === Write to live feed file (watched by GUI WebSocket) ===
+# This is a single shared file that the chokidar watcher detects instantly.
+# The GUI reads the last line and displays it in the Live Feed tab.
+LIVE_FEED="$ORG_DIR/.live-feed.log"
+mkdir -p "$(dirname "$LIVE_FEED")"
+echo "| $TIMESTAMP | $AGENT | $TOOL | $ACTION | $TARGET | $SUMMARY |" >> "$LIVE_FEED"
+
+# Keep live feed file from growing too large (last 200 lines)
+if [[ -f "$LIVE_FEED" ]] && [[ $(wc -l < "$LIVE_FEED") -gt 300 ]]; then
+  tail -200 "$LIVE_FEED" > "$LIVE_FEED.tmp" && mv "$LIVE_FEED.tmp" "$LIVE_FEED"
 fi
 
 exit 0
