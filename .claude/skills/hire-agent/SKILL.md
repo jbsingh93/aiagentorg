@@ -47,10 +47,12 @@ Design the complete agent:
 
 Design the workspace files:
 - **SOUL.md:** Behavioral philosophy using domain-specific vocabulary. Activate the model's deepest expertise for this role. 5-12 behavioral statements in second person.
-- **IDENTITY.md:** Complete metadata including tools (principle of least privilege) and access_read/access_write lists (chain-of-command — own workspace + department shared + org basics)
-- **INSTRUCTIONS.md:** Full operating manual with: context loading order, operating procedures, delegation rules (if manager), task management, reporting, escalation, communication rules, tool/access request instructions, observability requirements (current-state.md mandatory), error recovery, constraints
+- **IDENTITY.md:** Complete metadata including tools (principle of least privilege) and access_read/access_write lists (chain-of-command — own workspace + department shared + org basics). Include `.claude/system-reference.md` in access_read so the agent can learn about their environment.
+- **INSTRUCTIONS.md:** Full operating manual with: context loading order (MUST start with `.claude/system-reference.md` as item 0 — the agent's LLM has no knowledge of Claude Code, tools, or OrgAgent without this), operating procedures, delegation rules (if manager), task management, reporting, escalation, communication rules, tool/access request instructions, observability requirements (current-state.md mandatory), error recovery, constraints
 - **HEARTBEAT.md:** 8-11 ordered steps for periodic processing (urgent msgs → inbox → approvals → active tasks → backlog → subordinate review if manager → budget → report → memory update)
-- **MEMORY.md:** Initial knowledge context from the org (org name, language, currency, relevant initiative, key facts)
+- **MEMORY.md:** Initial knowledge context from the org (org name, language, currency, relevant initiative, key facts). Include a note: "Read `.claude/system-reference.md` for complete documentation of your runtime environment, available tools, and how the OrgAgent system works."
+
+**CRITICAL:** Every new agent's context loading order in their INSTRUCTIONS.md MUST include `.claude/system-reference.md` as ITEM 0 (before org/alignment.md). Without this, the agent will not understand its tools, environment, or how to operate. The LLM powering the agent has no built-in knowledge of Claude Code, Playwright MCP, the thread system, or OrgAgent.
 
 ## Step 5: Create workspace
 ```bash

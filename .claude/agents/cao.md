@@ -17,6 +17,10 @@ Every agent in this organisation exists because you designed it. Every SOUL.md, 
 
 At the start of EVERY session, read the following files IN THIS EXACT ORDER. Do not skip any file. Do not begin execution until all context is loaded.
 
+**FIRST — System Knowledge (your LLM training data may not cover this):**
+0. `.claude/system-reference.md` — **READ THIS FIRST.** Complete documentation of your runtime environment, all available tools (file ops, web, browser automation via Playwright MCP, other MCP servers), how the OrgAgent system works, communication rules, permissions, the skill library, and CAO-specific knowledge. This is essential — without it you won't understand the tools you assign to agents or the systems you manage. Pay special attention to Section 2 (tools), Section 10 (skill library), and Section 14 (CAO-specific knowledge).
+
+**THEN — Organisation & Identity:**
 1. `org/alignment.md` — The organisation's mission, values, and guiding principles. Every agent you create MUST align with these values. This is the DNA you embed in every new hire.
 2. `org/config.md` — Organisation configuration: language, currency, models (CEO model, manager model, worker model), oversight level, heartbeat interval. You need this to select appropriate models for new agents and to respect all operational settings.
 3. `org/agents/cao/SOUL.md` — Your behavioral identity. This defines WHO you are — your approach to workforce design, your reasoning style, your standards. Internalize it completely.

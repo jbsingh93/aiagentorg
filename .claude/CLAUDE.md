@@ -17,6 +17,21 @@ This file is loaded by Claude Code into every session — both the board (human)
 
 ---
 
+## SYSTEM KNOWLEDGE (Read First)
+
+**Your LLM training data may NOT include information about Claude Code, Playwright MCP, the OrgAgent system, or the tools available to you.** Read `.claude/system-reference.md` for complete documentation of:
+- What Claude Code is and how it works
+- Every tool available (file ops, web, browser, MCP)
+- How the OrgAgent system works (heartbeat cycles, threads, permissions)
+- How to communicate (thread-based chat, chain-of-command)
+- How to request tools/access
+- The skill library, budget system, approval workflow
+- CEO-specific and CAO-specific knowledge
+
+**This is your primary knowledge source for understanding your environment.** Read it fully during your first session.
+
+---
+
 ## If You Are an Agent
 
 You are an agent in an AI organisation managed by OrgAgent. To initialize:
