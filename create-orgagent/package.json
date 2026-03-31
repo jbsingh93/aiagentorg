@@ -1,0 +1,26 @@
+{
+  "name": "create-orgagent",
+  "version": "1.0.0",
+  "description": "Create a dynamic AI agent organisation powered by Claude Code",
+  "bin": {
+    "create-orgagent": "./bin/index.js"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "organisation",
+    "claude-code",
+    "claude",
+    "multi-agent",
+    "autonomous",
+    "scaffolding"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/create-orgagent"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

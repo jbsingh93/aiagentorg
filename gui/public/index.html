@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrgAgent Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+  <!-- D3.js v7 -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <!-- Chart.js v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- ================================================================== -->
+  <!-- HEADER                                                              -->
+  <!-- ================================================================== -->
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="header-logo">&#x1F3E2;</span>
+      <h1>OrgAgent</h1>
+      <span class="header-subtitle" id="orgName">Dashboard</span>
+    </div>
+    <div class="header-meta">
+      <span class="status-dot status-active"></span>
+      <span id="headerClock"></span>
+    </div>
+  </header>
+
+  <!-- ================================================================== -->
+  <!-- TAB NAVIGATION                                                      -->
+  <!-- ================================================================== -->
+  <nav class="tab-bar" role="tablist">
+    <button class="tab active" data-tab="overview"  role="tab">Overview</button>
+    <button class="tab"        data-tab="orgchart"  role="tab">Org Chart</button>
+    <button class="tab"        data-tab="agents"    role="tab">Agents</button>
+    <button class="tab"        data-tab="tasks"     role="tab">Tasks</button>
+    <button class="tab"        data-tab="threads"   role="tab">Threads</button>
+    <button class="tab"        data-tab="budget"    role="tab">Budget</button>
+    <button class="tab"        data-tab="board"     role="tab">Board</button>
+    <button class="tab"        data-tab="activity"  role="tab">Activity</button>
+  </nav>
+
+  <!-- ================================================================== -->
+  <!-- TAB CONTENT PANELS                                                  -->
+  <!-- ================================================================== -->
+  <main class="tab-panels">
+
+    <!-- ---- OVERVIEW -------------------------------------------------- -->
+    <section id="panel-overview" class="tab-panel active">
+      <div class="overview-grid">
+        <div class="card stat-card" id="stat-agents">
+          <div class="stat-label">Active Agents</div>
+          <div class="stat-value" id="statAgentCount">--</div>
+        </div>
+        <div class="card stat-card" id="stat-tasks-active">
+          <div class="stat-label">Active Tasks</div>
+          <div class="stat-value" id="statActiveTaskCount">--</div>
+        </div>
+        <div class="card stat-card" id="stat-tasks-done">
+          <div class="stat-label">Completed Tasks</div>
+          <div class="stat-value" id="statDoneTaskCount">--</div>
+        </div>
+        <div class="card stat-card" id="stat-pending">
+          <div class="stat-label">Pending Approvals</div>
+          <div class="stat-value" id="statPendingCount">--</div>
+        </div>
+        <div class="card stat-card" id="stat-budget">
+          <div class="stat-label">Budget Spent</div>
+          <div class="stat-value" id="statBudgetSpent">--</div>
+        </div>
+        <div class="card stat-card" id="stat-threads">
+          <div class="stat-label">Active Threads</div>
+          <div class="stat-value" id="statThreadCount">--</div>
+        </div>
+      </div>
+
+      <div class="overview-row">
+        <div class="card overview-half">
+          <h3>Recent Activity</h3>
+          <div id="overviewActivity" class="mini-table-wrap"></div>
+        </div>
+        <div class="card overview-half">
+          <h3>Budget Overview</h3>
+          <div class="chart-container">
+            <canvas id="overviewBudgetChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- ORG CHART ------------------------------------------------- -->
+    <section id="panel-orgchart" class="tab-panel">
+      <div class="card">
+        <h2>Organisation Chart</h2>
+        <div id="orgchartTree" class="orgchart-container"></div>
+      </div>
+    </section>
+
+    <!-- ---- AGENTS ---------------------------------------------------- -->
+    <section id="panel-agents" class="tab-panel">
+      <div class="card">
+        <h2>Agents</h2>
+        <div id="agentsList" class="agents-grid"></div>
+      </div>
+
+      <!-- Agent detail drawer -->
+      <div id="agentDetail" class="card agent-detail" style="display:none"></div>
+    </section>
+
+    <!-- ---- TASKS (Kanban) -------------------------------------------- -->
+    <section id="panel-tasks" class="tab-panel">
+      <h2>Task Board</h2>
+      <div class="kanban">
+        <div class="kanban-col">
+          <div class="kanban-header">Backlog</div>
+          <div class="kanban-cards" id="kanban-backlog"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-header">Active</div>
+          <div class="kanban-cards" id="kanban-active"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-header">Done</div>
+          <div class="kanban-cards" id="kanban-done"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- THREADS --------------------------------------------------- -->
+    <section id="panel-threads" class="tab-panel">
+      <div class="threads-toolbar card">
+        <label>Department:
+          <select id="threadDeptFilter">
+            <option value="">All</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="threadsList" class="threads-list"></div>
+
+      <!-- Send as Board -->
+      <div class="card send-form">
+        <h3>Send as Board</h3>
+        <form id="boardSendForm">
+          <label>To:
+            <select id="sendTo" required></select>
+          </label>
+          <label>Message:
+            <textarea id="sendBody" rows="3" placeholder="Type a board directive..." required></textarea>
+          </label>
+          <button type="submit" class="btn btn-blue">Send</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ---- BUDGET ---------------------------------------------------- -->
+    <section id="panel-budget" class="tab-panel">
+      <div class="card">
+        <h2>Budget</h2>
+        <div class="budget-summary" id="budgetSummary"></div>
+        <div class="chart-container budget-chart-wrap">
+          <canvas id="budgetDonutChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Agent Allocations</h3>
+        <div id="budgetAgentsTable"></div>
+      </div>
+
+      <div class="card">
+        <h3>Recent Transactions</h3>
+        <div id="budgetTransactions"></div>
+      </div>
+    </section>
+
+    <!-- ---- BOARD (approvals) ----------------------------------------- -->
+    <section id="panel-board" class="tab-panel">
+      <div class="card">
+        <h2>Pending Approvals</h2>
+        <div id="approvalsList"></div>
+      </div>
+    </section>
+
+    <!-- ---- ACTIVITY -------------------------------------------------- -->
+    <section id="panel-activity" class="tab-panel">
+      <div class="card">
+        <h2>Audit Log</h2>
+        <div class="activity-toolbar">
+          <button class="btn btn-small" id="auditPrev" disabled>&lt; Prev</button>
+          <span id="auditPageInfo">Page 1</span>
+          <button class="btn btn-small" id="auditNext">Next &gt;</button>
+        </div>
+        <div id="auditTable"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <span>OrgAgent Dashboard &mdash; localhost only &mdash; no authentication</span>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

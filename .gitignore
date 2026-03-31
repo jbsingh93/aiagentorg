@@ -1,0 +1,21 @@
+# Runtime org data (created by /onboard — unique per user)
+org/
+
+# Dependencies
+node_modules/
+
+# User-specific Claude Code settings
+.claude/settings.local.json
+.claude/agent-memory/
+.claude/agent-memory-local/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.swp
+
+# Distribution build artifacts
+create-orgagent/template/

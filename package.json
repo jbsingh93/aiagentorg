@@ -1,0 +1,17 @@
+{
+  "name": "orgagent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Agent Organisation — powered by Claude Code",
+  "scripts": {
+    "dashboard": "node gui/server.js",
+    "heartbeat": "bash scripts/heartbeat.sh",
+    "heartbeat:ceo": "bash scripts/heartbeat.sh ceo",
+    "heartbeat:cao": "bash scripts/heartbeat.sh cao"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "marked": "^15.0.0",
+    "gray-matter": "^4.0.3"
+  }
+}

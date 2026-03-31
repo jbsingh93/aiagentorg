@@ -1,0 +1,65 @@
+{
+  "permissions": {
+    "allow": [
+      "Read", "Write", "Edit", "Glob", "Grep",
+      "Bash(date *)", "Bash(mkdir *)", "Bash(mv *)", "Bash(cp *)",
+      "Bash(ls *)", "Bash(wc *)", "Bash(head *)", "Bash(tail *)",
+      "Bash(claude *)", "Bash(node *)", "Bash(bash *)", "Bash(jq *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Write|Edit|Glob|Grep",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/data-access-check.sh" }]
+      },
+      {
+        "matcher": "Write|Edit",
+        "if": "Write(org/board/decisions/*)|Edit(org/board/decisions/*)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/require-board-approval.sh" }]
+      },
+      {
+        "matcher": "Write|Edit",
+        "if": "Write(.claude/agents/*)|Edit(.claude/agents/*)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/require-cao-or-board.sh" }]
+      },
+      {
+        "matcher": "Skill",
+        "if": "Skill(hire-agent)|Skill(fire-agent)|Skill(reconfigure-agent)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/skill-access-check.sh" }]
+      },
+      {
+        "matcher": "Write",
+        "if": "Write(org/agents/*/inbox/*)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/message-routing-check.sh" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Write|Edit|Glob|Grep|Bash",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/activity-logger.sh" }]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/remind-state-update.sh" }]
+      },
+      {
+        "matcher": "Write",
+        "if": "Write(org/agents/*/tasks/*)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/budget-check.sh" }]
+      }
+    ],
+    "SubagentStart": [
+      { "hooks": [{ "type": "command", "command": "bash scripts/hooks/log-agent-activation.sh" }] }
+    ],
+    "SubagentStop": [
+      { "hooks": [{ "type": "command", "command": "bash scripts/hooks/log-agent-deactivation.sh" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "bash scripts/hooks/require-state-and-communication.sh" }] }
+    ]
+  },
+  "env": {
+    "ORGAGENT_ORG_DIR": "org"
+  }
+}
