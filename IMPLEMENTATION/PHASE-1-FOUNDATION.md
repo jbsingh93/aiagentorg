@@ -137,6 +137,18 @@
 
 ---
 
+## Implementation Notes (Post-Phase Updates)
+
+The following changes affect Phase 1 files and should be applied if not already done:
+
+- **`.claude/system-reference.md`** must include Section 0 (autonomy philosophy), Sections 13-20 (dynamic capabilities). See `TO-DO/21-AUTONOMY-AND-DYNAMIC-CAPABILITIES.md`.
+- **`org/config.md` format** now includes `spending_limits` fields. See `TO-DO/10-FILE-FORMAT-SPECIFICATIONS.md`.
+- **Onboarding** now collects 13 areas (was 11): added Area 11 (spending/wallet) and Area 12 (infrastructure/n8n/browser). See `TO-DO/14-ONBOARDING-SKILL-FULL-SPEC.md`.
+- **Total architecture decisions:** 51 (was 44). See `TO-DO/09-ARCHITECTURE-DECISIONS.md`.
+- **Total TO-DO docs:** 22 (21 markdown + 1 PNG).
+
+---
+
 ## Phase 1 Verification
 
 After completing all tasks:

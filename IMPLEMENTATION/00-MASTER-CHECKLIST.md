@@ -151,6 +151,10 @@ Which TO-DO doc to read for each component:
 | **Agent definitions** | `14` (Steps 2.10-2.12) | `01` (Section 3-4), `10` (format 18) |
 | **Heartbeat script** | `01` (lines 604-714) | `16` (budget update) |
 | **Continuous operation** | `18` (full spec) | `09` (Decisions 38-40) |
+| **Autonomy philosophy** | `21` (full spec) | `09` (Decisions 45-51) |
+| **Dynamic connectors** | `21` (Section 3) | `19` (browser), `20` (skill library) |
+| **Org wallet / spending** | `21` (Section 6) | Onboarding (config.md) |
+| **Temporal awareness** | `21` (Section 8) | system-reference.md (Section 0) |
 | **run-org skill** | `18` (Section 4.2) | — |
 | **cancel-org skill** | `18` (Section 4.3) | — |
 | **Enhanced Stop hook** | `18` (Section 4.1) | `16` (existing hook) |

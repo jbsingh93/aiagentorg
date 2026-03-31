@@ -52,6 +52,7 @@ A **dynamic, self-organizing AI agent organisation system** where:
 | 18 | `18-CONTINUOUS-OPERATION-RALPH-WIGGUM.md` | **NEW** — Ralph Wiggum Stop-hook pattern for continuous autonomous operation |
 | 19 | `19-BROWSER-AUTOMATION.md` | **NEW** — Three-tier browser strategy: Playwright MCP (primary), CLI (secondary), Chrome (interactive). Permission integration, /browser skill |
 | 20 | `20-SKILL-LIBRARY-SYSTEM.md` | **NEW** — Custom skill creation, sharing, registry. org/skills/ library, /create-skill meta-skill, versioning, permission integration |
+| 21 | `21-AUTONOMY-AND-DYNAMIC-CAPABILITIES.md` | **NEW** — Core autonomy philosophy, dynamic connectors, internal systems, webhooks, org wallet, external hiring, temporal awareness. Decisions 45-51. |
 
 ---
 
@@ -87,6 +88,13 @@ A **dynamic, self-organizing AI agent organisation system** where:
 28. **20 system skills total** — +browser, +create-skill
 29. **Browser automation** — Playwright MCP (autonomous headless), Playwright CLI (token-efficient), Claude in Chrome (interactive). Privileged tool — CAO determines access.
 30. **Skill library** — org/skills/ with registry, versioning, sharing, permission-controlled access. CAO/supervisors create skills via /create-skill.
+31. **Autonomy philosophy** — agents are fully autonomous. They BUILD connectors, systems, event listeners on demand. Nothing pre-built.
+32. **Dynamic connectors** — org/connectors/ for agent-built integrations. Research → build → deploy → skill-wrap.
+33. **Dynamic internal systems** — agents create org/finance/, org/customers/, org/orders/ etc. when the business needs them.
+34. **Org wallet** — configurable spending limits for real business money. CEO limit + board threshold in config.md.
+35. **External hiring** — agents can outsource tasks to freelancers/companies when AI can't do it.
+36. **Temporal awareness** — ALL agents use current date in searches. NEVER use outdated tools/libraries.
+37. **51 architecture decisions total**
 
 ---
 

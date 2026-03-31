@@ -186,7 +186,40 @@ The conversation flows through these areas naturally. You do NOT need to follow 
 - "Any company policies, regulatory requirements, or industry standards?"
 - "Anything else I should know before we set up your organisation?"
 
-#### Area 11: Model Configuration
+#### Area 11: Business Spending & Wallet
+**What to collect:**
+- Does the org need to spend real money? (subscriptions, ads, freelancers, etc.)
+- If yes: spending limits for different roles
+- CEO approval limit (amount CEO can approve without board)
+- Board approval threshold (above this needs human approval)
+- Currency for business spending (same as org currency by default)
+
+**Example questions:**
+- "Will your organisation need to spend real money? For example: paying for SaaS subscriptions, running ad campaigns, hiring freelancers?"
+- "If yes: what's the maximum amount the CEO should be able to approve without your involvement? For example: up to 500 DKK for routine expenses."
+- "And anything above that amount would require your explicit approval?"
+
+**Output:** Added to `org/config.md`:
+```yaml
+spending_limits:
+  ceo_approval_limit: 500
+  manager_approval_limit: 100
+  board_required_above: 500
+```
+
+#### Area 12: Infrastructure & Tools
+**What to collect:**
+- Does the user have n8n running? (for integrations and webhooks)
+- Does the user want browser automation enabled? (Playwright MCP)
+- Any existing API keys or service accounts agents should use?
+- Any services the org needs to connect to from day one?
+
+**Example questions:**
+- "Do you have n8n running? It's great for connecting to external services like Shopify, Gmail, payment platforms. If you do, agents can use it to build integrations automatically."
+- "Should agents have browser access? This lets them navigate websites, create accounts, fill forms — useful when no API exists for a service."
+- "Are there any services you already use that agents should connect to? For example: Shopify, Gmail, a CRM, social media platforms?"
+
+#### Area 13: Model Configuration
 **What to collect:**
 - Preferred models for each tier (or accept defaults)
 - Max budget per single agent run

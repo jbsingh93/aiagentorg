@@ -50,7 +50,12 @@ Do not edit manually unless you know what you're doing.
 | `cao_model` | string | Model ID | CAO's model |
 | `manager_model` | string | Model ID | Default for managers |
 | `worker_model` | string | Model ID | Default for workers |
-| `max_budget_per_run_usd` | number | Decimal | Max USD per single agent run |
+| `max_budget_per_run` | number | Decimal | Max cost per single agent run (in configured currency) |
+| `spending_limits.ceo_approval_limit` | number | Decimal | Max amount CEO can approve without board |
+| `spending_limits.manager_approval_limit` | number | Decimal | Max amount managers can approve |
+| `spending_limits.board_required_above` | number | Decimal | Board approval required above this |
+| `n8n_available` | boolean | true/false | Whether n8n is available for integrations |
+| `browser_enabled` | boolean | true/false | Whether Playwright browser automation is enabled |
 
 ---
 

@@ -111,7 +111,7 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | 06 | CLAUDE-CODE-PERSISTENCE-CLI-RESEARCH.md | CLAUDE.md, memory, settings, CLI |
 | 07 | OPENCLAW-RESEARCH.md | OpenClaw agent architecture (workspace inspiration) |
 | 08 | SCREENSHOT-ANALYSIS.md | Original org chart diagram |
-| 09 | ARCHITECTURE-DECISIONS.md | All 44 design decisions with reasoning |
+| 09 | ARCHITECTURE-DECISIONS.md | All 51 design decisions with reasoning |
 | 10 | FILE-FORMAT-SPECIFICATIONS.md | 26 file format specs with examples |
 | 11 | DISTRIBUTION-PLAN.md | npx create-orgagent packaging |
 | 12 | DYNAMIC-PERMISSIONS-AND-ACCESS-CONTROL.md | Tool permissions, data access, request workflows |
@@ -123,6 +123,7 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | 18 | CONTINUOUS-OPERATION-RALPH-WIGGUM.md | Ralph Wiggum Stop-hook pattern, /run-org, /cancel-org, stale detection |
 | 19 | BROWSER-AUTOMATION.md | Playwright MCP/CLI/Chrome, permission integration, /browser skill |
 | 20 | SKILL-LIBRARY-SYSTEM.md | org/skills/ library, /create-skill, registry, versioning, sharing |
+| 21 | AUTONOMY-AND-DYNAMIC-CAPABILITIES.md | Core philosophy, dynamic connectors, internal systems, webhooks, wallet, hiring, temporal awareness |
 
 ## Key Constraints
 

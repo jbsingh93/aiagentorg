@@ -259,3 +259,75 @@ Decision: PreToolUse hook on Skill tool, checking ORGAGENT_CURRENT_AGENT.
 - Mode B: `/loop 30m /run-org` — scheduled wake-up for fully autonomous operation
 
 **New skills:** `/run-org` (start loop) + `/cancel-org` (stop loop) = 18 total skills
+
+---
+
+## Q&A Round 6: Autonomy Philosophy & Dynamic Capabilities (2026-03-31, post-testing)
+
+### Context: Dropshipping Ecom Stress Test
+User tested the vision against a real business scenario (dropshipping ecommerce). This revealed gaps in external service integration, event-driven responses, financial tracking, customer data, and order management.
+
+### Q: Should we pre-build integrations for Shopify, Gmail, etc.?
+**A: NO. Agents build connectors dynamically.**
+> "THE CORE IDEA AND MOAT OF THIS PROJECT IS ITS AUTONOMY, SO IT SHOULD BE ABLE TO BUILD THESE EXTERNAL SERVICE CONNECTORS ON THE FLY"
+> "THE CAO AND SUPERIOR AGENT SHOULD DETERMINE WHICH CONNECTORS/TOOLS/SKILLS THE AGENT SHOULD BE ABLE TO USE"
+
+Key decisions:
+- CAO hires a DevOps/Integration team to build connectors
+- Connectors stored in `org/connectors/` with registry
+- Agent researches SOTA approach (MCP > CLI > API > browser), handles auth, builds, creates skill
+
+### Q: Should we pre-build webhook systems?
+**A: NO. Agents build them dynamically. All approaches available.**
+> "D) All of the above — agent picks the best approach for each case"
+
+n8n, Express.js, standalone scripts, or polling — agent determines best fit.
+
+### Q: Should we pre-build finance, customer, order systems?
+**A: NO. Agents create them when the business needs them.**
+> "This is something the agents should be able to create on demand"
+
+CEO/CFO designs the system, CAO hires the team if needed.
+
+### Q: How should we handle real-money spending?
+**A: Org wallet with configurable limits.**
+> "The org should have its own wallet... approval or spending limits should be customizable in both onboarding and later"
+
+- CEO can approve up to configured limit
+- Board approval above threshold
+- Limits in org/config.md, adjustable
+
+### Q: Should we pre-build templates for internal systems (finance, CRM)?
+**A: No templates. Capability + awareness only.**
+> "I'm afraid B would prime the LLM too much and it will be too rigid... A is a good start. But we need to make it aware of the possibility and WHY"
+> "THEY NEED TO UNDERSTAND THAT THEY ARE 100% AUTONOMOUS AGENTS THAT CAN DO EVERYTHING THEY WANT WITHOUT THE NEED FOR A HUMAN"
+
+The WHY is critical. Agents need to understand their POWER, not just have tools.
+
+### Q: Should the CAO build connectors itself?
+**A: No, hire a team.**
+> "Yes it should hire a team"
+
+CAO hires DevOps/Integration engineers who specialise in building connectors.
+
+### Q: Time/date awareness?
+**A: CRITICAL. Agents must ALWAYS use current date.**
+> "WE NEED TO MAKE SURE ALL THE AGENTS HAVE THEIR TIME AND DATE AND THAT THEY ACTUALLY USE THAT TIME/DATE AWARENESS WHEN DOING ONLINE SEARCH"
+
+Example: "DALL-E is an old image model... now its nano banana 2"
+
+### Q: Can the org hire external humans?
+**A: Yes, for tasks impossible for AI.**
+> "The system should be able to hire other companies/freelancers to perform tasks that is impossible for the system to do itself"
+
+Use browser for freelancer platforms, email for communication, board approval for spending.
+
+### Derived Requirements
+1. Agents are FULLY AUTONOMOUS — can build anything within alignment boundaries
+2. Nothing is pre-built — connectors, systems, webhooks all created on demand
+3. The WHY matters more than the HOW — agents need to understand their power
+4. CAO hires specialised teams, doesn't do technical work itself
+5. Org wallet with configurable spending limits
+6. Temporal awareness mandatory — always use current date in research
+7. External hiring possible for impossible tasks
+8. SOUL.md must instill initiative, not passivity — "do not create passive agents"
