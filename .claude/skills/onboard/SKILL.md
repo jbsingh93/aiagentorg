@@ -1,6 +1,6 @@
 ---
 name: onboard
-description: "Deep alignment conversation to bootstrap a new AI agent organisation. Collects mission, values, goals, language, currency, budget, oversight level, ethics, custom rules, and domain knowledge through an interactive dialogue. Then creates the complete org structure: config, alignment, orgchart, budgets, initiatives, CEO workspace, CAO workspace, agent definitions, and audit trail."
+description: "Deep alignment conversation to bootstrap a new AI agent organisation. Collects mission, values, goals, language, currency, budget, oversight level, ethics, custom rules, domain knowledge, business spending limits, and infrastructure preferences through an interactive dialogue. Then creates the complete org structure: config, alignment, orgchart, budgets, initiatives, connectors, skills library, CEO workspace, CAO workspace, agent definitions, and audit trail."
 disable-model-invocation: true
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -168,7 +168,37 @@ The conversation flows through these areas naturally. You do NOT need to follow 
 - "Any company policies, regulatory requirements, or industry standards?"
 - "Anything else I should know before we set up your organisation?"
 
-#### Area 11: Model Configuration
+#### Area 11: Business Spending & Wallet
+**What to collect:**
+- Does the org need to spend real money? (SaaS subscriptions, ads, freelancers, etc.)
+- If yes: spending limits for different roles
+- CEO approval limit (amount CEO can approve without board)
+- Board approval threshold (above this needs human approval)
+
+**Example questions:**
+- "Will your organisation need to spend real money beyond the AI agent costs? For example: paying for SaaS subscriptions like Shopify, running ad campaigns, hiring freelancers for tasks AI can't do?"
+- "If yes: what's the maximum amount the CEO should be able to approve on its own without your involvement? For example: up to 500 DKK for routine business expenses."
+- "And anything above that amount would require your explicit approval as the board?"
+- "What about department managers — should they be able to approve smaller expenses? For example: up to 100 DKK?"
+
+**If user says no real spending needed:** Set all limits to 0 (board approval required for any real spending).
+
+#### Area 12: Infrastructure & External Tools
+**What to collect:**
+- Does the user have n8n running? (for integrations and webhooks)
+- Should browser automation be enabled? (Playwright MCP — for navigating websites, creating accounts, filling forms when no API exists)
+- Any existing API keys or service accounts agents should use?
+- Any services the org needs to connect to from day one?
+- Does the user want agents to be able to dynamically build their own integrations?
+
+**Example questions:**
+- "Do you have n8n running? It's a workflow automation tool — if available, your agents can use it to connect to external services like Shopify, Gmail, payment platforms, and more."
+- "Should your agents have browser access? This means they can navigate websites, create accounts, fill forms — extremely useful when a service doesn't have an API. It's like giving them a web browser on their computer."
+- "Are there any services you already use that agents should connect to right away? For example: Shopify, Gmail, a CRM, social media platforms, payment processors?"
+- "Do you have any existing API keys or accounts your agents should use?"
+- "Your agents have the ability to research and build their own integrations to external services on the fly. Should they be free to do this autonomously (within budget limits), or should building new integrations require your approval?"
+
+#### Area 13: Model Configuration
 **What to collect:**
 - Preferred models for each tier (or accept defaults)
 - Max budget per single agent run
@@ -176,7 +206,7 @@ The conversation flows through these areas naturally. You do NOT need to follow 
 
 **Example questions:**
 - "For the AI models, I recommend: Opus (most capable) for CEO and CAO, Sonnet (balanced) for managers, Haiku (fast and cheap) for workers. Want to change any of these?"
-- "What's the maximum you'd want a single agent run to cost? Default is $5."
+- "What's the maximum you'd want a single agent run to cost? Default is 5 in your configured currency."
 - "How often should the heartbeat cycle run? Recommended: every 2 hours. Options: 30 minutes to daily."
 
 ### Conversation Completion Check
@@ -196,20 +226,26 @@ Before proceeding to Phase 2, verify you have ALL of these (do NOT proceed if an
 | 9 | Communication tone | |
 | 10 | Reporting frequency | |
 | 11 | Currency (ISO 4217 code) | |
-| 12 | Monthly budget | |
+| 12 | Monthly API budget | |
 | 13 | Oversight level | |
 | 14 | Decision-making style | |
 | 15 | Risk tolerance | |
 | 16 | Domain knowledge / key info | |
 | 17 | Custom rules (or "none") | |
-| 18 | Model preferences (or defaults) | |
-| 19 | Max budget per run | |
-| 20 | Heartbeat interval | |
+| 18 | Business spending: CEO approval limit | |
+| 19 | Business spending: Board threshold | |
+| 20 | n8n available? (yes/no) | |
+| 21 | Browser automation enabled? (yes/no) | |
+| 22 | Existing services to connect? | |
+| 23 | Dynamic integration building approved? | |
+| 24 | Model preferences (or defaults) | |
+| 25 | Max budget per run | |
+| 26 | Heartbeat interval | |
 
 If ANY item is missing, ask the user before proceeding. Present a summary:
 
 "Here's what I've collected. Please confirm or correct anything:"
-[Present all 20 data points in a clean summary]
+[Present all 26 data points in a clean summary]
 
 Only proceed when the user confirms.
 
@@ -229,10 +265,12 @@ Use Bash to create all directories:
 mkdir -p org/board/decisions org/board/approvals
 mkdir -p org/initiatives org/messages/urgent
 mkdir -p org/budgets
-mkdir -p org/agents/ceo/memory org/agents/ceo/tasks/backlog org/agents/ceo/tasks/active org/agents/ceo/tasks/done org/agents/ceo/inbox org/agents/ceo/activity org/agents/ceo/reports
-mkdir -p org/agents/cao/memory org/agents/cao/tasks/backlog org/agents/cao/tasks/active org/agents/cao/tasks/done org/agents/cao/inbox org/agents/cao/activity org/agents/cao/reports
+mkdir -p org/agents/ceo/memory org/agents/ceo/tasks/backlog org/agents/ceo/tasks/active org/agents/ceo/tasks/done org/agents/ceo/inbox org/agents/ceo/activity org/agents/ceo/reports org/agents/ceo/credentials
+mkdir -p org/agents/cao/memory org/agents/cao/tasks/backlog org/agents/cao/tasks/active org/agents/cao/tasks/done org/agents/cao/inbox org/agents/cao/activity org/agents/cao/reports org/agents/cao/credentials
 mkdir -p org/threads/executive org/threads/requests
 mkdir -p org/rules
+mkdir -p org/connectors
+mkdir -p org/skills/shared org/skills/agent-specific
 ```
 
 ### Step 2.2: Write org/config.md
@@ -256,6 +294,14 @@ cao_model: {CAO_MODEL}
 manager_model: {MANAGER_MODEL}
 worker_model: {WORKER_MODEL}
 max_budget_per_run: {MAX_BUDGET_PER_RUN}
+spending_limits:
+  ceo_approval_limit: {CEO_APPROVAL_LIMIT}
+  manager_approval_limit: {MANAGER_APPROVAL_LIMIT}
+  board_required_above: {BOARD_REQUIRED_ABOVE}
+n8n_available: {TRUE_OR_FALSE}
+browser_enabled: {TRUE_OR_FALSE}
+dynamic_integration_building: {TRUE_OR_FALSE}
+initial_services: {LIST_OR_NONE}
 ---
 
 # Organisation Configuration — {ORG_NAME}
@@ -425,7 +471,53 @@ These rules were defined during onboarding and MUST be followed by all agents.
 {CUSTOM_RULES_FROM_CONVERSATION}
 ```
 
-### Step 2.10: Write CEO Workspace
+### Step 2.10: Write org/connectors/registry.md
+
+```markdown
+# Connector Registry — {ORG_NAME}
+
+> Last updated: {TODAY_DATETIME}
+> Total connectors: 0
+
+No external service connectors built yet.
+
+When the organisation needs to connect to an external service (e.g., Shopify, Gmail, Stripe, social media),
+the DevOps/Integration team will research, build, and register the connector here.
+
+See `.claude/system-reference.md` Section 13 for the connector-building workflow.
+
+| Connector | Service | Type | Built By | Date | Status | Used By |
+|-----------|---------|------|----------|------|--------|---------|
+```
+
+### Step 2.11: Write org/skills/registry.md
+
+```markdown
+# Skill Library — {ORG_NAME}
+
+> Last updated: {TODAY_DATETIME}
+> Total skills: 0
+
+No custom skills yet. Use /create-skill to add reusable workflows to the library.
+
+See `.claude/system-reference.md` Section 10 for skill library documentation.
+
+## Shared Skills
+
+| Skill | Created By | Date | Description | Used By |
+|-------|-----------|------|-------------|---------|
+
+## Department Skills
+
+(Sections will be added as departments are created)
+
+## Agent-Specific Skills
+
+| Skill | Agent | Created By | Date | Description |
+|-------|-------|-----------|------|-------------|
+```
+
+### Step 2.12: Write CEO Workspace
 
 #### org/agents/ceo/SOUL.md
 
@@ -649,7 +741,7 @@ Execute these steps in order during every heartbeat cycle:
 - CAO will assess hiring needs based on CEO directives
 ```
 
-### Step 2.11: Write CAO Workspace
+### Step 2.13: Write CAO Workspace
 
 #### org/agents/cao/SOUL.md
 
@@ -888,7 +980,7 @@ Execute these steps in order during every heartbeat cycle:
 (Updated as hires are made — track what roles were needed and why)
 ```
 
-### Step 2.12: Write Agent Definitions
+### Step 2.14: Write Agent Definitions
 
 #### .claude/agents/ceo.md
 
@@ -993,12 +1085,21 @@ After creating all files, verify:
 | 21 | .claude/agents/ceo.md | | |
 | 22 | .claude/agents/cao.md | | |
 | 23 | org/rules/custom-rules.md (if applicable) | | |
+| 24 | org/connectors/registry.md | | |
+| 25 | org/skills/registry.md | | |
+| 26 | org/connectors/ (directory exists) | | |
+| 27 | org/skills/shared/ (directory exists) | | |
 
 Run verification:
 ```bash
 # Check all critical files exist
-for f in org/config.md org/alignment.md org/orgchart.md org/budgets/overview.md org/budgets/spending-log.md org/board/audit-log.md org/agents/ceo/SOUL.md org/agents/ceo/IDENTITY.md org/agents/ceo/INSTRUCTIONS.md org/agents/ceo/HEARTBEAT.md org/agents/ceo/MEMORY.md org/agents/cao/SOUL.md org/agents/cao/IDENTITY.md org/agents/cao/INSTRUCTIONS.md org/agents/cao/HEARTBEAT.md org/agents/cao/MEMORY.md .claude/agents/ceo.md .claude/agents/cao.md; do
+for f in org/config.md org/alignment.md org/orgchart.md org/budgets/overview.md org/budgets/spending-log.md org/board/audit-log.md org/connectors/registry.md org/skills/registry.md org/agents/ceo/SOUL.md org/agents/ceo/IDENTITY.md org/agents/ceo/INSTRUCTIONS.md org/agents/ceo/HEARTBEAT.md org/agents/ceo/MEMORY.md org/agents/cao/SOUL.md org/agents/cao/IDENTITY.md org/agents/cao/INSTRUCTIONS.md org/agents/cao/HEARTBEAT.md org/agents/cao/MEMORY.md .claude/agents/ceo.md .claude/agents/cao.md; do
   if [ -f "$f" ]; then echo "✓ $f"; else echo "✗ MISSING: $f"; fi
+done
+
+# Check directories
+for d in org/connectors org/skills/shared org/skills/agent-specific org/threads/executive org/threads/requests org/agents/ceo/activity org/agents/ceo/credentials org/agents/cao/activity org/agents/cao/credentials; do
+  if [ -d "$d" ]; then echo "✓ $d/"; else echo "✗ MISSING DIR: $d/"; fi
 done
 ```
 
@@ -1012,22 +1113,37 @@ After verification, present to the user:
 Created:
 - Alignment document with mission, values, and principles
 - Organisation chart: Board → CEO → CAO
-- Budget: {MONTHLY_BUDGET} {CURRENCY_CODE}/month
+- API Budget: {MONTHLY_BUDGET} {CURRENCY_CODE}/month
+- Business spending limits: CEO up to {CEO_LIMIT} {CURRENCY_CODE}, board above {BOARD_THRESHOLD} {CURRENCY_CODE}
 - {N} strategic initiatives
+- Connector registry (empty — agents will build integrations as needed)
+- Skill library (empty — agents will create workflows as needed)
 - CEO agent (model: {CEO_MODEL}) — ready for heartbeat
 - CAO agent (model: {CAO_MODEL}) — ready for heartbeat
+- n8n integration: {ENABLED/DISABLED}
+- Browser automation: {ENABLED/DISABLED}
+
+Your organisation is FULLY AUTONOMOUS. The agents can:
+- Build their own external service connectors (Shopify, Gmail, payment, ads, etc.)
+- Create internal business systems (finance, CRM, orders, inventory)
+- Set up webhook listeners for real-time event handling
+- Hire freelancers for tasks AI can't do (with your approval for large amounts)
+- Research and use the latest tools and approaches (temporal awareness built in)
 
 Next steps:
-1. Run the first CEO heartbeat: /heartbeat ceo
-2. The CEO will review initiatives and request agents from the CAO
-3. Run the CAO heartbeat: /heartbeat cao
-4. The CAO will propose new agents based on CEO's requests
-5. Approve proposed agents: /approve
-6. Schedule automated heartbeats: /loop 2h /heartbeat
+1. Start continuous operation: /run-org
+   (This runs heartbeat cycles autonomously until all work is processed.
+   The CEO will create a strategic plan, the CAO will hire needed agents,
+   and the org will start executing. You only need to approve proposals.)
+
+2. Or start manually:
+   /heartbeat    — run one full cycle
+   /status       — check org overview
 
 Optional:
-- Start the dashboard: /dashboard
-- Check org status anytime: /status
+- Start the dashboard: /dashboard (visual overview at localhost:3000)
+- Schedule background operation: /loop 30m /run-org
+- Check budget anytime: /budget-check
 ```
 
 ---
@@ -1052,6 +1168,17 @@ All `{PLACEHOLDERS}` in the templates above are filled in by Claude during Phase
 - `{OVERSIGHT_LEVEL}` — from Area 8
 - `{TONE}` — from Area 6
 - `{VALUES_LIST}` — from Area 3
+
+**Spending placeholders:**
+- `{CEO_APPROVAL_LIMIT}` — from Area 11 (default: 500)
+- `{MANAGER_APPROVAL_LIMIT}` — from Area 11 (default: 100)
+- `{BOARD_REQUIRED_ABOVE}` — from Area 11 (default: 500)
+
+**Infrastructure placeholders:**
+- `{TRUE_OR_FALSE}` for n8n_available — from Area 12
+- `{TRUE_OR_FALSE}` for browser_enabled — from Area 12
+- `{TRUE_OR_FALSE}` for dynamic_integration_building — from Area 12
+- `{LIST_OR_NONE}` for initial_services — from Area 12
 
 **Model placeholders:**
 - `{CEO_MODEL}` — default: opus
