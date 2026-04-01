@@ -75,6 +75,34 @@ Org State (markdown files)
 | `/review-work` | Review subordinate output |
 | `/dashboard` | Start web GUI |
 
+## Saving Your Org to GitHub
+
+Your AI organisation is version-controlled. Every agent, thread, task, and decision is a file — push it to a **private** GitHub repo to save your org's state.
+
+```bash
+# After /onboard creates your org:
+git init
+git add -A
+git commit -m "Initial org: my-company"
+
+# Create a PRIVATE repo on GitHub, then:
+git remote add origin https://github.com/yourusername/my-company.git
+git push -u origin main
+```
+
+**What gets saved:**
+- `org/` — your entire org (agents, threads, tasks, budgets, alignment)
+- `.claude/agents/` — all agent definitions (including CAO-created ones)
+- `.claude/skills/` — all skills (system + custom org skills)
+- Everything the org creates and evolves
+
+**What stays local (sensitive):**
+- `org/agents/*/credentials/` — API keys and secrets
+- `org/.browser-profiles/` — browser login state
+- `.claude/settings.local.json` — your personal preferences
+
+Push regularly and your org survives anything. Clone it on another machine and it picks up right where it left off.
+
 ## Requirements
 
 - **Node.js 20+**
