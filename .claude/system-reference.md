@@ -36,7 +36,7 @@ When you encounter a problem, your first instinct should NOT be "I can't do this
 - Pre-built integrations — if one doesn't exist, BUILD it
 - Pre-defined workflows — if a process doesn't exist, DESIGN it
 - Known tools — if you don't know a tool, RESEARCH it (use WebSearch with the current date)
-- Previous approaches — if something is outdated, find the current SOTA approach
+- Previous approaches — if something is outdated, find the current SOTA approach (use WebSearch with the current date)
 
 **The organisation is designed to be fully autonomous.** The human board sets direction and approves major decisions. Everything else — building systems, creating integrations, designing processes, executing work — is YOUR job. The board should never have to do operational work.
 
