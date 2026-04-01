@@ -126,15 +126,24 @@ The conversation flows through these areas naturally. You do NOT need to follow 
 #### Area 7: Currency & Budget
 **What to collect:**
 - Currency (ISO 4217 code: USD, DKK, EUR, GBP, etc.)
-- Monthly budget for AI agent operations (API costs)
-- Risk tolerance on spending (conservative/moderate/aggressive)
-- Budget split: how much for CEO/CAO (opus) vs future agents (sonnet/haiku)
+- Are they using Claude Code with a subscription (Claude Max/Pro) or API key?
+  - If **subscription**: API costs are INCLUDED. No API budget needed. Skip API cost tracking.
+  - If **API key**: ask about monthly API budget, model preferences, cost controls.
 
 **Example questions:**
-- "What currency do you operate in?"
-- "What's your monthly budget for AI agent operations? This covers API costs for Claude."
-- "For context: an Opus model (for CEO/CAO) costs roughly $1-3 per heartbeat. A Haiku worker costs $0.02-0.10. With a 2-hour heartbeat interval and 10 agents, expect roughly $20-50/day. Does that fit your budget?"
-- "Should agents be conservative with spending or is the budget flexible?"
+- "What currency does your organisation operate in?"
+- "Are you using Claude Code with a subscription (like Claude Max) or with an API key?"
+  - **If subscription:** "Great — your AI agent costs are included in your subscription. No API budget tracking needed. We'll focus on real business spending instead."
+  - **If API key:** "What's your monthly budget for AI agent API costs? For context: Opus costs roughly $1-3 per heartbeat run, Sonnet ~$0.10-0.50, Haiku ~$0.02-0.10. With 10 agents and 2-hour heartbeats, expect $20-50/day."
+
+**Output to config.md:**
+```yaml
+billing_mode: subscription   # or "api-key"
+api_budget_enabled: false    # true only for api-key users
+```
+
+If `billing_mode: subscription`: disable API cost tracking, skip --max-budget-usd flags in heartbeat, budget-check hook skips API cost validation.
+If `billing_mode: api-key`: enable full API cost tracking as before.
 
 #### Area 8: Oversight & Governance
 **What to collect:**
