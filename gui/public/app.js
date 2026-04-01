@@ -796,17 +796,18 @@
                   role === 'assistant' ? '🤖 Claude' : '⚙️ System';
 
     let bubbleContent = esc(content);
-    if (role === 'assistant') {
-      // Basic markdown: bold, code blocks, inline code, headers, lists
-      bubbleContent = content
-        .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/^### (.+)$/gm, '<h4>$1</h4>')
-        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^# (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^- (.+)$/gm, '• $1<br>')
-        .replace(/\n/g, '<br>');
+    if (role === 'assistant' && typeof marked !== 'undefined') {
+      // Use marked.js for proper markdown rendering
+      try {
+        bubbleContent = marked.parse(content, {
+          breaks: true,
+          gfm: true
+        });
+      } catch (_) {
+        bubbleContent = esc(content).replace(/\n/g, '<br>');
+      }
+    } else if (role === 'assistant') {
+      bubbleContent = esc(content).replace(/\n/g, '<br>');
     }
 
     const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
