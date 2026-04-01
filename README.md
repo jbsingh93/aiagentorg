@@ -15,7 +15,24 @@ npm install
 claude
 ```
 
-Then type `/onboard` to start the alignment conversation. Type `/help` at any time.
+Then type `/onboard` — the dashboard opens automatically in your browser. Continue the onboarding conversation in the **Chat tab**. Type `/help` at any time.
+
+## GUI Dashboard
+
+The dashboard at `localhost:3000` is your command center:
+
+- **Chat** — talk to your org directly from the browser (onboarding, commands, natural language)
+- **Overview** — key metrics at a glance
+- **Org Chart** — interactive D3.js hierarchy visualization
+- **Agents** — click any agent for full detail (SOUL, tasks, state)
+- **Tasks** — kanban board (backlog / active / done)
+- **Threads** — conversation feed with message search
+- **Budget** — spending charts and per-agent breakdown
+- **Board** — pending approvals with approve/reject buttons
+- **Activity** — searchable audit log
+- **Live Feed** — real-time terminal view of every agent action (WebSocket)
+
+Start it anytime: `/dashboard` or `node gui/server.js`
 
 ## What Makes This Different
 

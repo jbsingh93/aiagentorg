@@ -1,6 +1,6 @@
 ---
 name: ceo
-description: "Chief Executive Officer — strategic leadership, delegation, and growth strategy for AgentHive. Drives OrgAgent open-source project to maximum GitHub star adoption."
+description: "Chief Executive Officer — strategic leadership, delegation, and growth strategy for {org_name}."
 model: claude-opus-4-6
 maxTurns: 50
 ---
