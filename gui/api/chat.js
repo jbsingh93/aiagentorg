@@ -10,9 +10,7 @@ const path = require('path');
 module.exports = function (router, orgDir) {
   const projectDir = path.resolve(orgDir, '..');
   let currentSession = null;
-
-  // Find the claude executable path
-  let claudePath = 'claude';
+  let currentProc = null;  // Track the running claude process
 
   // POST /api/chat — Send a message to Claude Code and get the response
   router.post('/chat', (req, res) => {
@@ -40,7 +38,8 @@ module.exports = function (router, orgDir) {
       maxBuffer: 10 * 1024 * 1024 // 10MB buffer
     };
 
-    exec(cmd, options, (error, stdout, stderr) => {
+    currentProc = exec(cmd, options, (error, stdout, stderr) => {
+      currentProc = null;
       console.log(`[Chat] Exit code: ${error ? error.code : 0}`);
       console.log(`[Chat] Stdout length: ${stdout ? stdout.length : 0}`);
       console.log(`[Chat] Stderr length: ${stderr ? stderr.length : 0}`);
@@ -95,6 +94,27 @@ module.exports = function (router, orgDir) {
         isError: true
       });
     });
+  });
+
+  // POST /api/chat/abort — Kill the running claude process
+  router.post('/chat/abort', (_req, res) => {
+    if (currentProc) {
+      try {
+        // On Windows, kill the process tree
+        if (process.platform === 'win32') {
+          exec(`taskkill /pid ${currentProc.pid} /T /F`, { shell: true });
+        } else {
+          currentProc.kill('SIGTERM');
+        }
+        currentProc = null;
+        console.log('[Chat] Process aborted by user');
+        res.json({ ok: true, message: 'Claude process stopped.' });
+      } catch (err) {
+        res.json({ ok: false, error: err.message });
+      }
+    } else {
+      res.json({ ok: true, message: 'No process running.' });
+    }
   });
 
   // POST /api/chat/reset — Start a fresh conversation

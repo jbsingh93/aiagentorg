@@ -933,6 +933,16 @@
       });
     }
 
+    // Abort button
+    const abortBtn = $('#chatAbort');
+    if (abortBtn) {
+      abortBtn.addEventListener('click', async () => {
+        await apiPost('/chat/abort', {});
+        setChatBusy(false);
+        addChatMessage('system', 'Process stopped by user.');
+      });
+    }
+
     // Skill shortcut buttons
     for (const btn of $$('.chat-skill-btn')) {
       btn.addEventListener('click', () => {

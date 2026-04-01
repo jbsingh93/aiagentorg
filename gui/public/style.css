@@ -921,6 +921,10 @@ table.data-table tr:hover td { background: var(--bg-hover); }
   border-top: 1px solid var(--border);
 }
 
+.chat-abort {
+  margin-left: auto;
+}
+
 .thinking-dots {
   display: flex;
   gap: 4px;
