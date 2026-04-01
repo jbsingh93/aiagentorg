@@ -70,11 +70,20 @@ for d in 4 5 6; do
 done
 
 echo "=== OrgAgent Heartbeat Cycle — $(date -u +"%Y-%m-%dT%H:%M:%S") ==="
+echo "Phase 0 (Alignment Board): alignment-board"
 echo "Phase 1 (CEO): $CEO_AGENTS"
 echo "Phase 2 (Managers): $MANAGER_AGENTS"
 echo "Phase 3 (Workers): $WORKER_AGENTS"
 echo "Phase 4 (CAO): cao"
 echo ""
+
+# Phase 0: Alignment Board (sequential, runs FIRST — governance review)
+echo "--- Phase 0: Alignment Board ---"
+if [[ -f ".claude/agents/alignment-board.md" ]] && [[ -d "$ORG_DIR/agents/alignment-board" ]]; then
+  run_agent "alignment-board"
+else
+  echo "[$(date -u +"%Y-%m-%dT%H:%M:%S")] Alignment Board not yet created — skipping Phase 0"
+fi
 
 # Phase 1: CEO (sequential)
 echo "--- Phase 1: CEO ---"

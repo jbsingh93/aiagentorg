@@ -206,7 +206,26 @@ The conversation flows through these areas naturally. You do NOT need to follow 
 - "Do you have any existing API keys or accounts your agents should use?"
 - "Your agents have the ability to research and build their own integrations to external services on the fly. Should they be free to do this autonomously (within budget limits), or should building new integrations require your approval?"
 
-#### Area 13: Model Configuration
+#### Area 13: Alignment Board Configuration
+**What to collect:**
+- How much authority should the Alignment Board have?
+  - `maximum` — Board approves everything within alignment. Human only for mission/values changes.
+  - `strategic` — Board handles routine approvals. Strategic changes (new markets, pivots) require human.
+  - `conservative` — Board monitors and flags issues. Most approvals still need human.
+- Should the Alignment Board govern real-money spending? (yes/no)
+- Should amendable sections (strategic priorities, target markets) require human approval? (yes/no)
+- Violation response preferences (how aggressive on misalignment)
+
+**Example questions:**
+- "Your organisation will have an Alignment Board — an AI governance layer that acts on your behalf when you're away. It reviews proposals, detects alignment drift, and can halt agents that violate your values. How much authority should it have?"
+  - "Option 1: Maximum Autonomy — The Board approves everything within your alignment. You only get involved for mission or values changes."
+  - "Option 2: Strategic Oversight — The Board handles routine approvals, but strategic changes like new markets or pivots need your approval."
+  - "Option 3: Conservative — The Board monitors and flags issues, but most approvals still need you."
+- "Should the Alignment Board be able to govern real-money spending? Or should all spending require your personal approval?"
+- "When an alignment violation is detected, should the Board automatically halt the violating agent? Or just warn and let you decide?"
+- "The Alignment Board can update strategic priorities and target markets (but NEVER your mission or values). Should these strategy changes require your approval, or can the Board update them autonomously?"
+
+#### Area 14: Model Configuration
 **What to collect:**
 - Preferred models for each tier (or accept defaults)
 - Max budget per single agent run
@@ -246,9 +265,12 @@ Before proceeding to Phase 2, verify you have ALL of these (do NOT proceed if an
 | 21 | Browser automation enabled? (yes/no) | |
 | 22 | Existing services to connect? | |
 | 23 | Dynamic integration building approved? | |
-| 24 | Model preferences (or defaults) | |
-| 25 | Max budget per run | |
-| 26 | Heartbeat interval | |
+| 24 | Alignment Board authority level | |
+| 25 | Alignment Board spending governance | |
+| 26 | Amendable sections require human? | |
+| 27 | Model preferences (or defaults) | |
+| 28 | Max budget per run | |
+| 29 | Heartbeat interval | |
 
 If ANY item is missing, ask the user before proceeding. Present a summary:
 
@@ -279,6 +301,8 @@ mkdir -p org/threads/executive org/threads/requests
 mkdir -p org/rules
 mkdir -p org/connectors
 mkdir -p org/skills/shared org/skills/agent-specific
+mkdir -p org/agents/alignment-board/memory org/agents/alignment-board/tasks/backlog org/agents/alignment-board/tasks/active org/agents/alignment-board/tasks/done org/agents/alignment-board/inbox org/agents/alignment-board/activity org/agents/alignment-board/reports
+mkdir -p org/board/governance-reports
 ```
 
 ### Step 2.2: Write org/config.md
@@ -310,6 +334,15 @@ n8n_available: {TRUE_OR_FALSE}
 browser_enabled: {TRUE_OR_FALSE}
 dynamic_integration_building: {TRUE_OR_FALSE}
 initial_services: {LIST_OR_NONE}
+alignment_board:
+  enabled: true
+  model: opus
+  authority_level: {MAXIMUM_OR_STRATEGIC_OR_CONSERVATIVE}
+  can_approve_hiring: true
+  can_approve_spending: {TRUE_OR_FALSE}
+  can_amend_strategy: {TRUE_OR_FALSE}
+  alignment_amendments_require_human: {TRUE_OR_FALSE}
+  spending_governance: {TRUE_OR_FALSE}
 ---
 
 # Organisation Configuration — {ORG_NAME}

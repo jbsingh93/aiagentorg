@@ -36,6 +36,24 @@ BOARD ACTIONS
   /escalate [agent]     Escalate an issue up the chain
   /message [from] [to]  Send a message between agents
 
+ALIGNMENT & GOVERNANCE
+  The Alignment Board is a 3-layer governance system:
+  Layer 1: Constitutional hooks (always-on enforcement)
+  Layer 2: Alignment Board agent (Phase 0 of every heartbeat)
+  Layer 3: org/alignment.md (the constitution)
+
+  ONLY YOU can edit org/alignment.md (mission, values, ethics)
+  The Alignment Board handles everything else autonomously:
+  - Approves/rejects proposals on your behalf
+  - Detects alignment drift across the org
+  - Halts agents that violate alignment (soft/hard/nuclear)
+  - Can fire/replace the CEO if alignment is violated
+  - Can update strategic priorities (if configured)
+  - Reports governance summaries to you
+
+  To change alignment authority: edit org/config.md → alignment_board section
+  Governance reports: org/board/governance-reports/
+
 MONITORING
   /status               Org overview with agent count, tasks, budget
   /budget-check [agent] Check budget (org-wide or per agent)
@@ -111,6 +129,17 @@ Read `org/orgchart.md` if it exists. List all agents with status. Explain: CAO c
 
 ### Topic: "autonomy"
 Read `.claude/system-reference.md` Section 0. Explain the core philosophy: agents are fully autonomous, can build connectors, create systems, hire freelancers. Bounded by alignment and permissions only.
+
+### Topic: "alignment" or "alignment-board" or "governance"
+Explain the three-layer Alignment Board:
+- **Layer 1: Constitutional hooks** — always-on enforcement. alignment-protect.sh blocks ALL agent writes to org/alignment.md. alignment-check.sh validates decisions. spending-governor.sh enforces limits.
+- **Layer 2: Alignment Board agent** — runs Phase 0 (before CEO) every heartbeat. Reviews proposals, detects drift, halts violating agents. Uses strongest model (opus), no token limits.
+- **Layer 3: org/alignment.md** — the constitution. Immutable core (mission, values, ethics — only human can change). Amendable sections (strategy, markets — configurable).
+
+**What only the human can do:** Edit org/alignment.md. Everything else is autonomous.
+**Violation levels:** Soft (warn), Hard (halt agent), Nuclear (halt ALL agents).
+**Configuration:** org/config.md → alignment_board section (authority_level, spending_governance, etc.)
+**Reports:** org/board/governance-reports/ — the board writes summaries each heartbeat.
 
 ### Topic: any other
 Search `.claude/skills/*/SKILL.md` for a matching skill name. If found, read and explain. If not found: "No help found for '{topic}'. Type /help to see all commands."

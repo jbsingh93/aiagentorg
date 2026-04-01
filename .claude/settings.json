@@ -10,6 +10,11 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": "Write|Edit",
+        "if": "Write(*alignment*)|Edit(*alignment*)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/alignment-protect.sh" }]
+      },
+      {
         "matcher": "Read|Write|Edit|Glob|Grep",
         "hooks": [{ "type": "command", "command": "bash scripts/hooks/data-access-check.sh" }]
       },
@@ -32,6 +37,11 @@
         "matcher": "Write",
         "if": "Write(org/agents/*/inbox/*)",
         "hooks": [{ "type": "command", "command": "bash scripts/hooks/message-routing-check.sh" }]
+      },
+      {
+        "matcher": "Write",
+        "if": "Write(org/initiatives/*)|Write(org/agents/*/tasks/backlog/*)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/alignment-check.sh" }]
       }
     ],
     "PostToolUse": [
@@ -47,6 +57,10 @@
         "matcher": "Write",
         "if": "Write(org/agents/*/tasks/*)",
         "hooks": [{ "type": "command", "command": "bash scripts/hooks/budget-check.sh" }]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/spending-governor.sh" }]
       }
     ],
     "SubagentStart": [
