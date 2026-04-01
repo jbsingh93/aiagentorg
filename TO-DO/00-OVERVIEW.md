@@ -53,6 +53,7 @@ A **dynamic, self-organizing AI agent organisation system** where:
 | 19 | `19-BROWSER-AUTOMATION.md` | **NEW** — Three-tier browser strategy: Playwright MCP (primary), CLI (secondary), Chrome (interactive). Permission integration, /browser skill |
 | 20 | `20-SKILL-LIBRARY-SYSTEM.md` | **NEW** — Custom skill creation, sharing, registry. org/skills/ library, /create-skill meta-skill, versioning, permission integration |
 | 21 | `21-AUTONOMY-AND-DYNAMIC-CAPABILITIES.md` | **NEW** — Core autonomy philosophy, dynamic connectors, internal systems, webhooks, org wallet, external hiring, temporal awareness. Decisions 45-51. |
+| 22 | `22-ALIGNMENT-BOARD-GOVERNANCE-LAYER.md` | **NEW** — Three-layer Alignment Board: constitutional hooks, governance agent (Phase 0), immutable core + amendable alignment. Violation assessment, drift prevention, spending governance. Decisions 52-58. |
 
 ---
 
@@ -94,7 +95,11 @@ A **dynamic, self-organizing AI agent organisation system** where:
 34. **Org wallet** — configurable spending limits for real business money. CEO limit + board threshold in config.md.
 35. **External hiring** — agents can outsource tasks to freelancers/companies when AI can't do it.
 36. **Temporal awareness** — ALL agents use current date in searches. NEVER use outdated tools/libraries.
-37. **51 architecture decisions total**
+37. **Alignment Board** — Three-layer governance: constitutional hooks (always-on), governance agent (Phase 0 of heartbeat), protected alignment document (immutable core + amendable periphery)
+38. **org/alignment.md is PROTECTED** — hook blocks ALL agent writes. Only human can edit. No alternative alignment files allowed.
+39. **Tiered violation response** — Soft (warn), Hard (halt agent), Nuclear (halt ALL agents)
+40. **Alignment Board authority configurable** — maximum autonomy, strategic oversight, or conservative. Set during onboarding.
+41. **58 architecture decisions total**
 
 ---
 

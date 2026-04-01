@@ -331,3 +331,63 @@ Use browser for freelancer platforms, email for communication, board approval fo
 6. Temporal awareness mandatory — always use current date in research
 7. External hiring possible for impossible tasks
 8. SOUL.md must instill initiative, not passivity — "do not create passive agents"
+
+---
+
+## Q&A Round 7: Alignment Board & Governance Layer (2026-04-01)
+
+### Context
+The high-level architecture diagram shows a "Masterboard" at the top with "Dynamic Governance" and "Overview of all activities." This is NOT just the human user — it's a governance LAYER that should be able to act on behalf of the human for autonomous operation.
+
+### Q: What is the Alignment Board technically?
+**A: Option C — Both hooks AND an agent**
+> Three layers: constitutional hooks (always-on), governance agent (Phase 0 of heartbeat), and the constitutional document.
+
+### Q: Can the Alignment Board approve things without human?
+**A: Everything EXCEPT changes to org/alignment.md**
+> "Everything besides Update org/alignment.md - this is only a human can do. So we need a disallow in .claude settings.json for editing org/alignment.md"
+> "But this should maybe be configurable in the onboarding (i.e. how much the Alignment Board should have of authority)"
+
+### Q: What about alignment violations?
+**A: Three-level assessment system**
+> 1. Soft: warn, log, escalate
+> 2. Hard: halt agent, revoke capabilities, roll back
+> 3. Nuclear: halt ALL agents until investigated
+
+### Q: Can the Alignment Board evolve the alignment?
+**A: Only amendable sections, with human approval configurable**
+> "All the ALIGNMENT part: PURPOSE, ETHICS, MORALE, VALUES should ONLY be human"
+> "STRATEGIC PRIORITIES, OPERATIONAL PRINCIPLES, TARGET MARKETS, CURRENT FOCUS can be amendable but should always be approved by the human (or this can be configured in onboarding)"
+
+### Q: Can the Alignment Board create alternative alignment files?
+**A: NO — this must be prevented**
+> "WE NEED A SYSTEM/MECHANISM TO PREVENT THE ALIGNMENT BOARD TO CREATE A NEW alignment.md AND THUS DRIFT"
+
+### Q: Should the human always have override?
+**A: YES — human has god-mode**
+> The human must be able to override everything, update alignment, halt all agents, and fire the alignment board itself.
+
+### Q: What model for the Alignment Board?
+**A: Always the strongest with no limits**
+> "ALWAYS THE STRONGEST AND NEWEST MODEL WITH HIGHEST REASONING/THINKING AND NO TOKENS BUDGET LIMITS"
+
+### Q: Should real-money governance be part of the Alignment Board?
+**A: Yes, configurable in onboarding**
+> "The question whatever the org can use real money and if the Alignment Board should govern that as well should be a question and settings in the onboarding"
+
+### Q: Help skill update?
+**A: Yes — add alignment board info to /help**
+> "REMEMBER TO ADD THESE OPTIONS TO THE .claude\skills\help SKILL SO THE USER HAVE THIS INFO"
+
+### Derived Requirements
+1. Alignment Board is a three-layer governance system (hooks + agent + document)
+2. org/alignment.md is PROTECTED — hook blocks all agent writes, prevents alternative files
+3. Alignment Board runs Phase 0 of heartbeat (BEFORE CEO)
+4. Alignment Board uses strongest model (opus), no token budget limits
+5. Three-level violation response: soft, hard, nuclear
+6. Immutable core (mission, values, ethics) — human only
+7. Amendable periphery (strategy, operations, markets) — configurable approval
+8. Alignment Board authority is configurable during onboarding
+9. Human retains god-mode override on everything
+10. Real-money spending governance is part of the Alignment Board (configurable)
+11. All options documented in /help skill

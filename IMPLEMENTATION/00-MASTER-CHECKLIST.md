@@ -155,6 +155,12 @@ Which TO-DO doc to read for each component:
 | **Dynamic connectors** | `21` (Section 3) | `19` (browser), `20` (skill library) |
 | **Org wallet / spending** | `21` (Section 6) | Onboarding (config.md) |
 | **Temporal awareness** | `21` (Section 8) | system-reference.md (Section 0) |
+| **Alignment Board** | `22` (full spec) | `09` (Decisions 52-58) |
+| **Alignment protection hook** | `22` (Section 3.1) | settings.json |
+| **Alignment check hook** | `22` (Section 3.2) | settings.json |
+| **Spending governor hook** | `22` (Section 3.3) | settings.json |
+| **Alignment Board agent** | `22` (Section 4) | Phase 0 of heartbeat |
+| **Violation assessment** | `22` (Section 3.4) | soft/hard/nuclear levels |
 | **run-org skill** | `18` (Section 4.2) | — |
 | **cancel-org skill** | `18` (Section 4.3) | — |
 | **Enhanced Stop hook** | `18` (Section 4.1) | `16` (existing hook) |

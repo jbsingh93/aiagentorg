@@ -44,6 +44,9 @@ Shared Org State (Markdown files in org/)
 9. **Continuous operation (Ralph Wiggum)** — `/run-org` triggers self-sustaining heartbeat loop via Stop hook. Org cycles until quiescent. Board intervenes only for approvals. `/cancel-org` to stop. `/loop 30m /run-org` for fully autonomous background operation.
 10. **`.claude/agents/` is READ-ONLY** — Agent definitions are templates created once. All runtime changes in `org/` only. Exception: CAO hiring/reconfiguring.
 11. **No manual orchestration** — Agents NEVER ask the user to run other agents. Heartbeat script + Ralph loop handle everything. Communication between agents goes through `org/threads/`.
+12. **Alignment Board (Three-Layer Governance)** — Constitutional hooks (always-on enforcement) + Alignment Review Agent (Phase 0 of heartbeat, opus model) + Protected alignment document (immutable core only human can change). The Alignment Board approves/rejects proposals, detects drift, halts violating agents, and acts on behalf of the human. The human's ONLY required task is approving changes to the core alignment (mission, values, ethics).
+13. **org/alignment.md is PROTECTED** — `alignment-protect.sh` hook blocks ALL agent writes. No alternative alignment files can be created. Only the human can edit the constitution.
+14. **Tiered violation response** — Soft (warn + log), Hard (halt agent + revoke tools), Nuclear (halt ALL + notify human).
 
 ## .claude/CLAUDE.md — Agent Initialization Guide
 
@@ -111,7 +114,7 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | 06 | CLAUDE-CODE-PERSISTENCE-CLI-RESEARCH.md | CLAUDE.md, memory, settings, CLI |
 | 07 | OPENCLAW-RESEARCH.md | OpenClaw agent architecture (workspace inspiration) |
 | 08 | SCREENSHOT-ANALYSIS.md | Original org chart diagram |
-| 09 | ARCHITECTURE-DECISIONS.md | All 51 design decisions with reasoning |
+| 09 | ARCHITECTURE-DECISIONS.md | All 58 design decisions with reasoning |
 | 10 | FILE-FORMAT-SPECIFICATIONS.md | 26 file format specs with examples |
 | 11 | DISTRIBUTION-PLAN.md | npx create-orgagent packaging |
 | 12 | DYNAMIC-PERMISSIONS-AND-ACCESS-CONTROL.md | Tool permissions, data access, request workflows |
@@ -124,6 +127,7 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | 19 | BROWSER-AUTOMATION.md | Playwright MCP/CLI/Chrome, permission integration, /browser skill |
 | 20 | SKILL-LIBRARY-SYSTEM.md | org/skills/ library, /create-skill, registry, versioning, sharing |
 | 21 | AUTONOMY-AND-DYNAMIC-CAPABILITIES.md | Core philosophy, dynamic connectors, internal systems, webhooks, wallet, hiring, temporal awareness |
+| 22 | ALIGNMENT-BOARD-GOVERNANCE-LAYER.md | Three-layer Alignment Board, constitutional hooks, governance agent, violation assessment, drift prevention |
 
 ## Key Constraints
 
