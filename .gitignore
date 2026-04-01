@@ -1,6 +1,13 @@
 # Runtime org data (created by /onboard — unique per user)
 org/
 
+# Runtime-created agent definitions (created by CAO during operation)
+# Only the 3 template agents (ceo.md, cao.md, alignment-board.md) are tracked
+.claude/agents/*
+!.claude/agents/ceo.md
+!.claude/agents/cao.md
+!.claude/agents/alignment-board.md
+
 # Dependencies
 node_modules/
 
