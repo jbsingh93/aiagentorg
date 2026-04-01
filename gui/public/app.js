@@ -777,6 +777,173 @@
   }
 
   // -------------------------------------------------------------------
+  // Chat — Board chat interface with Claude Code
+  // -------------------------------------------------------------------
+  let chatBusy = false;
+
+  function addChatMessage(role, content, meta) {
+    const container = $('#chatMessages');
+    if (!container) return;
+
+    // Remove welcome message on first real message
+    const welcome = container.querySelector('.chat-welcome');
+    if (welcome) welcome.remove();
+
+    const msg = document.createElement('div');
+    msg.className = `chat-msg msg-${role}`;
+
+    const label = role === 'user' ? '👤 You (Board)' :
+                  role === 'assistant' ? '🤖 Claude' : '⚙️ System';
+
+    let bubbleContent = esc(content);
+    if (role === 'assistant') {
+      // Basic markdown: bold, code blocks, inline code, headers, lists
+      bubbleContent = content
+        .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^- (.+)$/gm, '• $1<br>')
+        .replace(/\n/g, '<br>');
+    }
+
+    const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+    let metaHtml = `<span>${time}</span>`;
+    if (meta) {
+      if (meta.cost) metaHtml += `<span>Cost: ${meta.cost.toFixed(4)}</span>`;
+      if (meta.duration) metaHtml += `<span>${(meta.duration/1000).toFixed(1)}s</span>`;
+    }
+
+    msg.innerHTML = `
+      <div class="chat-msg-label">${label}</div>
+      <div class="chat-msg-bubble">${bubbleContent}</div>
+      <div class="chat-msg-meta">${metaHtml}</div>
+    `;
+
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function setChatBusy(busy) {
+    chatBusy = busy;
+    const thinking = $('#chatThinking');
+    const sendBtn = $('#chatSend');
+    const input = $('#chatInput');
+    if (thinking) thinking.style.display = busy ? 'flex' : 'none';
+    if (sendBtn) sendBtn.disabled = busy;
+    if (input) input.disabled = busy;
+  }
+
+  async function sendChatMessage(message) {
+    if (!message.trim() || chatBusy) return;
+
+    // Show user message
+    addChatMessage('user', message);
+
+    // Show thinking
+    setChatBusy(true);
+
+    try {
+      const response = await fetch(API + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        addChatMessage('system', data.error);
+      } else {
+        addChatMessage('assistant', data.content || 'No response.', {
+          cost: data.cost,
+          duration: data.duration
+        });
+
+        // Update session indicator
+        const indicator = $('#chatSessionStatus');
+        if (indicator && data.sessionId) {
+          indicator.textContent = 'Session active';
+          indicator.style.color = 'var(--accent-green)';
+        }
+      }
+    } catch (err) {
+      addChatMessage('system', 'Error: Could not reach Claude Code. Is the CLI installed?');
+    }
+
+    setChatBusy(false);
+  }
+
+  function initChat() {
+    const form = $('#chatForm');
+    const input = $('#chatInput');
+    const resetBtn = $('#chatReset');
+
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const msg = input.value.trim();
+        if (msg) {
+          input.value = '';
+          input.style.height = 'auto';
+          sendChatMessage(msg);
+        }
+      });
+    }
+
+    // Auto-resize textarea
+    if (input) {
+      input.addEventListener('input', () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+      });
+
+      // Enter to send (Shift+Enter for newline)
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          form.dispatchEvent(new Event('submit'));
+        }
+      });
+    }
+
+    // Reset chat
+    if (resetBtn) {
+      resetBtn.addEventListener('click', async () => {
+        await apiPost('/chat/reset', {});
+        const container = $('#chatMessages');
+        if (container) {
+          container.innerHTML = `
+            <div class="chat-welcome">
+              <div class="chat-welcome-icon">🏢</div>
+              <h3>Welcome to OrgAgent</h3>
+              <p>Chat with your AI organisation directly from the dashboard.<br>
+              Click a skill button above or type a message below.</p>
+              <p class="chat-welcome-hint">💡 Start with <strong>/onboard</strong> to create your organisation, or <strong>/help</strong> to see all commands.</p>
+            </div>`;
+        }
+        const indicator = $('#chatSessionStatus');
+        if (indicator) {
+          indicator.textContent = 'New conversation';
+          indicator.style.color = '';
+        }
+      });
+    }
+
+    // Skill shortcut buttons
+    for (const btn of $$('.chat-skill-btn')) {
+      btn.addEventListener('click', () => {
+        const cmd = btn.dataset.cmd;
+        if (cmd && !chatBusy) {
+          sendChatMessage(cmd);
+        }
+      });
+    }
+  }
+
+  // -------------------------------------------------------------------
   // WebSocket — Real-time updates from file watcher
   // -------------------------------------------------------------------
   let ws = null;
@@ -902,6 +1069,7 @@
 
     loadActivePanel();
     initLiveFeed();
+    initChat();
 
     // Connect WebSocket for real-time updates
     connectWebSocket();

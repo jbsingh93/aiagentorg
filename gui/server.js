@@ -234,6 +234,7 @@ require('./api/messages')(apiRouter, orgDir);
 require('./api/budget')(apiRouter, orgDir);
 require('./api/audit')(apiRouter, orgDir);
 require('./api/approvals')(apiRouter, orgDir);
+require('./api/chat')(apiRouter, orgDir);
 
 app.use('/api', apiRouter);
 

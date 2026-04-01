@@ -39,6 +39,7 @@
     <button class="tab"        data-tab="board"     role="tab">Board</button>
     <button class="tab"        data-tab="activity"  role="tab">Activity</button>
     <button class="tab"        data-tab="livefeed"  role="tab">Live Feed</button>
+    <button class="tab"        data-tab="chat"      role="tab">Chat</button>
   </nav>
 
   <!-- ================================================================== -->
@@ -215,6 +216,53 @@
         <div class="live-feed-status-bar" id="liveFeedStatusBar">
           <span id="feedEntryCount">0 entries</span>
           <span id="feedAgentStatuses"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- CHAT -------------------------------------------------------- -->
+    <section id="panel-chat" class="tab-panel">
+      <div class="card chat-card">
+        <div class="chat-header">
+          <h2>Board Chat</h2>
+          <div class="chat-controls">
+            <span class="chat-session-indicator" id="chatSessionStatus">New conversation</span>
+            <button class="btn btn-small" id="chatReset">New Chat</button>
+          </div>
+        </div>
+
+        <!-- Skill shortcuts -->
+        <div class="chat-skills">
+          <button class="chat-skill-btn" data-cmd="/onboard">Onboard</button>
+          <button class="chat-skill-btn" data-cmd="/run-org">Run Org</button>
+          <button class="chat-skill-btn" data-cmd="/status">Status</button>
+          <button class="chat-skill-btn" data-cmd="/approve">Approve</button>
+          <button class="chat-skill-btn" data-cmd="/help">Help</button>
+          <button class="chat-skill-btn" data-cmd="/budget-check">Budget</button>
+          <button class="chat-skill-btn" data-cmd="/heartbeat">Heartbeat</button>
+        </div>
+
+        <!-- Message area -->
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-welcome">
+            <div class="chat-welcome-icon">🏢</div>
+            <h3>Welcome to OrgAgent</h3>
+            <p>Chat with your AI organisation directly from the dashboard.<br>
+            Click a skill button above or type a message below.</p>
+            <p class="chat-welcome-hint">💡 Start with <strong>/onboard</strong> to create your organisation, or <strong>/help</strong> to see all commands.</p>
+          </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="chat-input-area">
+          <div class="chat-thinking" id="chatThinking" style="display:none">
+            <div class="thinking-dots"><span></span><span></span><span></span></div>
+            <span>Claude is working...</span>
+          </div>
+          <form class="chat-form" id="chatForm">
+            <textarea class="chat-input" id="chatInput" placeholder="Type a message or command (e.g. /onboard, /status, /help)..." rows="1"></textarea>
+            <button type="submit" class="btn btn-blue chat-send" id="chatSend">Send</button>
+          </form>
         </div>
       </div>
     </section>
