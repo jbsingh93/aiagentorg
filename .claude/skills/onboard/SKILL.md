@@ -11,13 +11,29 @@ argument-hint: "(no arguments — starts interactive alignment conversation)"
 
 Before starting, check if org/config.md exists. If it does, STOP and warn the user: "An organisation already exists (org/config.md found). Running onboarding again would overwrite your existing organisation. If you want to start fresh, delete the org/ directory first. If you want to modify settings, edit org/config.md directly."
 
-**First, greet the user and let them know about /help:**
+**FIRST: Launch the GUI Dashboard and direct the user there.**
 
-"Welcome to OrgAgent! I'm going to help you set up your AI agent organisation through a deep alignment conversation.
+1. Start the dashboard server in the background:
+```bash
+node gui/server.js &
+```
 
-💡 **Tip:** At any point during this process (or after), you can type `/help` to see all available commands and features, or `/help [topic]` for detailed help on any specific topic.
+2. Open the browser to the Chat tab:
+```bash
+start http://localhost:3000/#chat 2>/dev/null || open http://localhost:3000/#chat 2>/dev/null || echo "Open http://localhost:3000/#chat in your browser"
+```
 
-Let's get started!"
+3. Tell the user:
+
+"🚀 **Dashboard launched!** Opening http://localhost:3000 in your browser.
+
+👉 **Switch to the Chat tab** in the dashboard to continue the onboarding conversation there — it's much more user-friendly!
+
+You can also continue here in the terminal if you prefer. Type `/help` at any time for all available commands.
+
+---
+
+Let's get started! Tell me about your organisation — what's the name, and what do you do?"
 
 You are about to create a new AI agent organisation from scratch. This is the most important moment in the organisation's life — everything that follows depends on the alignment established here.
 

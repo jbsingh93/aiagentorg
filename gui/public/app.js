@@ -1067,6 +1067,21 @@
       // For now just show "Dashboard"
     });
 
+    // Check URL hash for direct tab navigation (e.g., /#chat from /onboard)
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      const targetTab = document.querySelector(`.tab[data-tab="${hash}"]`);
+      if (targetTab) {
+        // Deactivate all tabs and panels
+        for (const t of $$('.tab')) t.classList.remove('active');
+        for (const p of $$('.tab-panel')) p.classList.remove('active');
+        // Activate target
+        targetTab.classList.add('active');
+        const panel = $(`#panel-${hash}`);
+        if (panel) panel.classList.add('active');
+      }
+    }
+
     loadActivePanel();
     initLiveFeed();
     initChat();
