@@ -913,7 +913,7 @@ table.data-table tr:hover td { background: var(--bg-hover); }
 /* Thinking indicator */
 .chat-thinking {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 8px 20px;
   color: var(--text-secondary);
@@ -921,8 +921,52 @@ table.data-table tr:hover td { background: var(--bg-hover); }
   border-top: 1px solid var(--border);
 }
 
+.thinking-status {
+  flex: 1;
+  min-width: 0;
+}
+
+.thinking-label {
+  font-weight: 500;
+  color: var(--accent-blue);
+}
+
+.thinking-activity {
+  margin-top: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+  font-size: 0.78rem;
+  font-family: var(--font-mono, 'SF Mono', 'Consolas', monospace);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.thinking-activity-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: fadeInLine 0.3s ease;
+}
+
+.thinking-activity-line .activity-tool {
+  color: var(--accent-purple, #a78bfa);
+  font-weight: 500;
+}
+
+.thinking-activity-line .activity-target {
+  color: var(--text-tertiary, #6b7280);
+}
+
+@keyframes fadeInLine {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .chat-abort {
   margin-left: auto;
+  flex-shrink: 0;
+  align-self: center;
 }
 
 .thinking-dots {

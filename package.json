@@ -7,7 +7,14 @@
     "dashboard": "node gui/server.js",
     "heartbeat": "bash scripts/heartbeat.sh",
     "heartbeat:ceo": "bash scripts/heartbeat.sh ceo",
-    "heartbeat:cao": "bash scripts/heartbeat.sh cao"
+    "heartbeat:cao": "bash scripts/heartbeat.sh cao",
+    "test": "npx bats tests/hooks/*.bats && npx vitest run",
+    "test:hooks": "npx bats tests/hooks/*.bats",
+    "test:scripts": "npx bats tests/scripts/*.bats",
+    "test:gui": "npx vitest run tests/gui/",
+    "test:schemas": "npx vitest run tests/validation/",
+    "test:watch": "npx vitest watch",
+    "lint:bash": "shellcheck scripts/hooks/*.sh scripts/*.sh"
   },
   "dependencies": {
     "chokidar": "^5.0.0",
@@ -15,5 +22,13 @@
     "gray-matter": "^4.0.3",
     "marked": "^15.0.0",
     "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "bats": "^1.13.0",
+    "bats-assert": "^2.2.4",
+    "bats-support": "^0.3.0",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.2",
+    "zod": "^4.3.6"
   }
 }

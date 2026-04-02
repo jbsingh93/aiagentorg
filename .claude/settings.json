@@ -61,6 +61,11 @@
       {
         "matcher": "Write",
         "hooks": [{ "type": "command", "command": "bash scripts/hooks/spending-governor.sh" }]
+      },
+      {
+        "matcher": "Write|Edit",
+        "if": "Write(*MEMORY.md)|Edit(*MEMORY.md)",
+        "hooks": [{ "type": "command", "command": "bash scripts/hooks/memory-size-check.sh" }]
       }
     ],
     "SubagentStart": [

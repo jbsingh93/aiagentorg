@@ -1,29 +1,26 @@
 ---
 name: run-org
-description: "Start continuous autonomous operation. The organisation runs heartbeat cycles automatically until all work is processed. No manual intervention needed between cycles — the loop script handles everything. Board can approve proposals in a separate terminal."
+description: "Start continuous autonomous operation using native subagent heartbeats. Runs multiple heartbeat cycles until all work is processed. Managers and workers execute in parallel via the Agent tool. Board can approve proposals between cycles."
 disable-model-invocation: true
 user-invocable: true
-allowed-tools: Read, Write, Bash, Glob, Grep
-argument-hint: "[max-cycles|infinite] (default: 10, or 'infinite' for truly endless)"
+allowed-tools: Agent, Read, Write, Edit, Bash, Glob, Grep, Skill
+argument-hint: "[max-cycles] (default: 10)"
 ---
 
 # Run Organisation — Continuous Autonomous Operation
 
-Start the organisation's continuous operation loop. Heartbeat cycles run automatically until all work is processed and the org reaches a quiescent state.
+Start the organisation's continuous operation loop. Each cycle uses `/heartbeat` (native subagent orchestration) for true parallel execution of managers and workers.
 
 ## How It Works
 
-The `scripts/run-org.sh` bash script IS the loop:
+1. Check for pending work (unread inbox, pending approvals, recent backlog tasks)
+2. If work exists → run `/heartbeat` (subagent-based, parallel phases)
+3. After the cycle → check for new work created during this cycle
+4. If more work → present any pending approvals to the board, then run another cycle
+5. If no work → org is quiescent, stop
+6. Safety: max cycle limit (default 10)
 
-1. Check for pending work (unread notifications, pending approvals, recent tasks)
-2. If work exists → run a full 4-phase heartbeat cycle (CEO → Managers → Workers → CAO)
-3. After the cycle → check for pending work again
-4. If more work → immediately run another cycle (no delay)
-5. If no work → wait 60 seconds, check again
-6. If no work for 3 consecutive checks → org is quiescent, loop ends
-7. Safety: max cycle limit (default 10, or "infinite")
-
-**The user does NOT need to manually trigger anything between cycles.** The script handles all orchestration.
+**The user does NOT need to manually trigger anything between cycles.**
 
 ## Pre-flight Check
 

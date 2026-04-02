@@ -40,6 +40,16 @@ timestamp() { date -u +"%Y-%m-%dT%H:%M:%S"; }
 
 log() { echo "[$(timestamp)] $*"; }
 
+# Git checkpoint: snapshot org state before each heartbeat cycle
+checkpoint_org() {
+  local label="${1:-cycle}"
+  git add org/ 2>/dev/null || true
+  if ! git diff --cached --quiet 2>/dev/null; then
+    git commit -m "checkpoint: $label $(timestamp)" --no-gpg-sign 2>/dev/null || true
+    log "Git checkpoint created: $label"
+  fi
+}
+
 check_stop_signal() {
   if [[ -f "$ORG_DIR/.stop-org" ]]; then
     log "Stop signal detected (org/.stop-org). Shutting down."
@@ -134,6 +144,22 @@ while true; do
   log "=========================================="
   log "  Cycle $CYCLE — Pending: ${PENDING_UNREAD} unread, ${PENDING_APPROVALS} approvals, ${PENDING_TASKS} tasks"
   log "=========================================="
+
+  # Git checkpoint before each cycle (for rollback capability)
+  checkpoint_org "pre-cycle-$CYCLE"
+
+  # Run integrity check before heartbeat (Phase -1)
+  log "Running integrity check..."
+  integrity_result=$(bash scripts/integrity-check.sh 2>/dev/null) || true
+  integrity_status=$(echo "$integrity_result" | jq -r '.status // "unknown"' 2>/dev/null || echo "unknown")
+  if [[ "$integrity_status" == "critical" ]]; then
+    log "CRITICAL: Integrity check failed. Restoring from checkpoint."
+    git checkout HEAD -- org/ 2>/dev/null || true
+    log "State restored. Skipping this cycle."
+    continue
+  elif [[ "$integrity_status" == "degraded" ]]; then
+    log "WARNING: Integrity check found issues (auto-repaired where possible)"
+  fi
 
   # Run the full 4-phase heartbeat
   bash scripts/heartbeat.sh 2>&1 | while IFS= read -r line; do

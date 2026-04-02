@@ -27,6 +27,9 @@ case "$TOOL" in
     ;;
 esac
 
+# Normalize Windows backslashes to forward slashes
+TARGET="${TARGET//\\//}"
+
 # If no target path, allow (some tools have optional paths)
 if [[ -z "$TARGET" || "$TARGET" == "null" ]]; then exit 0; fi
 
@@ -38,10 +41,11 @@ if [[ ! -f "$IDENTITY_FILE" ]]; then
 fi
 
 # Extract allowed paths based on access type
+# Use a state-machine approach: set flag when key found, unset on next unindented key
 if [[ "$ACCESS_TYPE" == "read" ]]; then
-  ALLOWED=$(awk '/^access_read:/,/^[a-z]/' "$IDENTITY_FILE" | grep '^ *-' | sed 's/^ *- *//')
+  ALLOWED=$(awk '/^access_read:/{p=1;next} /^[a-z]/{p=0} p' "$IDENTITY_FILE" | grep '^ *-' | sed 's/^ *- *//')
 else
-  ALLOWED=$(awk '/^access_write:/,/^[a-z]/' "$IDENTITY_FILE" | grep '^ *-' | sed 's/^ *- *//')
+  ALLOWED=$(awk '/^access_write:/{p=1;next} /^[a-z]/{p=0} p' "$IDENTITY_FILE" | grep '^ *-' | sed 's/^ *- *//')
 fi
 
 # Check if target matches any allowed path

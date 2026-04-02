@@ -827,6 +827,8 @@
     container.scrollTop = container.scrollHeight;
   }
 
+  let chatActivityCount = 0;
+
   function setChatBusy(busy) {
     chatBusy = busy;
     const thinking = $('#chatThinking');
@@ -835,6 +837,89 @@
     if (thinking) thinking.style.display = busy ? 'flex' : 'none';
     if (sendBtn) sendBtn.disabled = busy;
     if (input) input.disabled = busy;
+
+    // Reset activity stream when starting
+    if (busy) {
+      chatActivityCount = 0;
+      const activityEl = $('#chatThinkingActivity');
+      if (activityEl) activityEl.innerHTML = '';
+      const label = $('#chatThinkingLabel');
+      if (label) label.textContent = 'Claude is working...';
+    }
+  }
+
+  /**
+   * Push a live feed event into the chat thinking indicator.
+   * Called from the WebSocket handler when chatBusy is true.
+   */
+  function pushChatActivity(data) {
+    if (!chatBusy) return;
+
+    const activityEl = $('#chatThinkingActivity');
+    const label = $('#chatThinkingLabel');
+    if (!activityEl) return;
+
+    chatActivityCount++;
+
+    // Determine a human-readable description from the WS event
+    let tool = '';
+    let target = '';
+    let description = '';
+
+    if (data.type === 'live-activity') {
+      // Activity logger events
+      tool = data.tool || '';
+      target = data.file || data.path || '';
+      description = data.summary || data.action || '';
+    } else if (data.type === 'file-change') {
+      tool = data.category || 'file';
+      target = data.path || '';
+    } else if (data.type === 'agent-status') {
+      tool = 'status';
+      description = data.status || '';
+      target = data.agent || '';
+    }
+
+    // Shorten path for display
+    if (target.length > 50) {
+      target = '...' + target.slice(-47);
+    }
+
+    // Update the main label with context
+    if (label) {
+      if (tool === 'Read') {
+        label.textContent = 'Reading files...';
+      } else if (tool === 'Write' || tool === 'Edit') {
+        label.textContent = 'Writing changes...';
+      } else if (tool === 'Bash') {
+        label.textContent = 'Running commands...';
+      } else if (tool === 'Grep' || tool === 'Glob') {
+        label.textContent = 'Searching codebase...';
+      } else if (tool === 'WebSearch') {
+        label.textContent = 'Searching the web...';
+      } else if (description) {
+        label.textContent = description;
+      } else {
+        label.textContent = `Claude is working... (${chatActivityCount} actions)`;
+      }
+    }
+
+    // Add activity line
+    const line = document.createElement('div');
+    line.className = 'thinking-activity-line';
+    line.innerHTML = (tool ? `<span class="activity-tool">${esc(tool)}</span> ` : '') +
+                     (target ? `<span class="activity-target">${esc(target)}</span>` : '') +
+                     (!tool && description ? esc(description) : '');
+
+    activityEl.appendChild(line);
+
+    // Keep max 8 lines visible, remove oldest
+    while (activityEl.children.length > 8) {
+      activityEl.removeChild(activityEl.firstChild);
+    }
+
+    // Auto-scroll
+    activityEl.scrollTop = activityEl.scrollHeight;
   }
 
   async function sendChatMessage(message) {
@@ -995,6 +1080,11 @@
 
         // Always feed to Live Feed (regardless of active tab)
         addFeedEntry(data);
+
+        // Feed activity to chat thinking indicator when busy
+        if (chatBusy) {
+          pushChatActivity(data);
+        }
 
         // Panel refresh logic
         if (data.type === 'file-change' || data.type === 'live-activity' || data.type === 'agent-status') {

@@ -48,50 +48,73 @@ module.exports = function (router, orgDir) {
         console.log(`[Chat] Stderr preview: ${stderr.substring(0, 200)}`);
       }
 
-      if (error && !stdout) {
+      // Filter out known CLI warnings from stderr (hook warnings, TTY detection, etc.)
+      const filteredStderr = (stderr || '').split('\n')
+        .filter(line => !line.match(/Warning.*processing without|Warning.*redirect stdin|Warning.*detected a tty|Warning.*data-access|Warning.*wait longer/i))
+        .join('\n').trim();
+
+      // Try to parse JSON from stdout first (even if there was an error exit code)
+      if (stdout) {
+        const jsonMatch = stdout.match(/\{[\s\S]*"session_id"[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            const result = JSON.parse(jsonMatch[0]);
+            currentSession = result.session_id || currentSession;
+            console.log(`[Chat] Session: ${currentSession}`);
+            console.log(`[Chat] Result length: ${(result.result || '').length}`);
+
+            return res.json({
+              role: 'assistant',
+              content: result.result || '(Claude completed but returned no text)',
+              sessionId: result.session_id || currentSession,
+              cost: result.cost_usd || 0,
+              duration: result.duration_ms || 0,
+              turns: result.num_turns || 1,
+              isError: result.is_error || false
+            });
+          } catch (parseErr) {
+            console.error(`[Chat] JSON parse error:`, parseErr.message);
+          }
+        }
+      }
+
+      // If claude exited with error and no parseable output
+      if (error) {
         console.error(`[Chat] Error:`, error.message);
+
+        // Check for timeout
+        if (error.killed || error.signal === 'SIGTERM') {
+          return res.json({
+            role: 'assistant',
+            content: 'Claude is still processing your request. The response is taking longer than expected. Check the Live Feed tab for progress, or try again in a moment.',
+            sessionId: currentSession,
+            cost: 0,
+            isError: false  // Not a real error — just slow
+          });
+        }
+
+        // Provide user-friendly error (without raw CLI warnings)
+        const userMessage = filteredStderr
+          ? `Claude encountered an issue:\n\n${filteredStderr}`
+          : `Claude encountered an issue. Check the server logs for details.`;
+
         return res.json({
           role: 'assistant',
-          content: `Error running Claude Code:\n\n${error.message}\n\n${stderr || ''}`.trim(),
+          content: userMessage,
           sessionId: currentSession,
           cost: 0,
           isError: true
         });
       }
 
-      // Try to parse JSON from stdout
-      // Claude may output progress text before/after the JSON — find the JSON object
-      const jsonMatch = stdout.match(/\{[\s\S]*"session_id"[\s\S]*\}/);
-
-      if (jsonMatch) {
-        try {
-          const result = JSON.parse(jsonMatch[0]);
-          currentSession = result.session_id || currentSession;
-          console.log(`[Chat] Session: ${currentSession}`);
-          console.log(`[Chat] Result length: ${(result.result || '').length}`);
-
-          return res.json({
-            role: 'assistant',
-            content: result.result || '(Claude completed but returned no text)',
-            sessionId: result.session_id || currentSession,
-            cost: result.cost_usd || 0,
-            duration: result.duration_ms || 0,
-            turns: result.num_turns || 1,
-            isError: result.is_error || false
-          });
-        } catch (parseErr) {
-          console.error(`[Chat] JSON parse error:`, parseErr.message);
-        }
-      }
-
-      // Fallback: return raw stdout or stderr
-      const text = stdout.trim() || stderr.trim() || 'No response from Claude. Check server logs for details.';
+      // Fallback: return raw stdout (non-JSON response)
+      const text = (stdout || '').trim() || 'No response from Claude. Check server logs for details.';
       res.json({
         role: 'assistant',
         content: text,
         sessionId: currentSession,
         cost: 0,
-        isError: true
+        isError: !stdout
       });
     });
   });
