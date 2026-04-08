@@ -36,9 +36,9 @@
 | Phase | Name | Files | Depends On | Checklist |
 |-------|------|-------|-----------|-----------|
 | 1 | Foundation | 7 | Nothing | [PHASE-1-FOUNDATION.md](PHASE-1-FOUNDATION.md) |
-| 2 | Skills | 16 | Phase 1 | [PHASE-2-SKILLS.md](PHASE-2-SKILLS.md) |
+| 2 | Skills | 18 | Phase 1 | [PHASE-2-SKILLS.md](PHASE-2-SKILLS.md) |
 | 3 | Core Agents | 2 | Phase 1 | [PHASE-3-AGENTS.md](PHASE-3-AGENTS.md) |
-| 4 | Scripts | 12 | Phase 1 | [PHASE-4-SCRIPTS.md](PHASE-4-SCRIPTS.md) |
+| 4 | Scripts | 14 | Phase 1 | [PHASE-4-SCRIPTS.md](PHASE-4-SCRIPTS.md) |
 | 5 | GUI Dashboard | 12 | Phases 1-4 | [PHASE-5-GUI.md](PHASE-5-GUI.md) |
 | 6 | Distribution | 3 | Phases 1-5 | [PHASE-6-DISTRIBUTION.md](PHASE-6-DISTRIBUTION.md) |
 | 7 | Testing | 0 (tests) | Phases 1-6 | [PHASE-7-TESTING.md](PHASE-7-TESTING.md) |
@@ -59,7 +59,7 @@
 - [ ] `.gitignore` — Git ignore rules
 - [ ] Update root `CLAUDE.md` — Reflect implementation state
 
-### Phase 2: Skills (16)
+### Phase 2: Skills (18)
 - [ ] `.claude/skills/onboard/SKILL.md`
 - [ ] `.claude/skills/heartbeat/SKILL.md`
 - [ ] `.claude/skills/delegate/SKILL.md`
@@ -78,12 +78,14 @@
 - [ ] master-gpt-prompter — ALREADY EXISTS (verify, do not overwrite)
 - [ ] `.claude/skills/run-org/SKILL.md`
 - [ ] `.claude/skills/cancel-org/SKILL.md`
+- [ ] `.claude/skills/compile-knowledge/SKILL.md`
+- [ ] `.claude/skills/query-knowledge/SKILL.md`
 
 ### Phase 3: Core Agents
 - [ ] `.claude/agents/ceo.md` — CEO definition
 - [ ] `.claude/agents/cao.md` — CAO definition
 
-### Phase 4: Scripts (12)
+### Phase 4: Scripts (14)
 - [ ] `scripts/heartbeat.sh` — Multi-phase orchestration
 - [ ] `scripts/hooks/activity-logger.sh`
 - [ ] `scripts/hooks/remind-state-update.sh`
@@ -96,6 +98,8 @@
 - [ ] `scripts/hooks/budget-check.sh`
 - [ ] `scripts/hooks/log-agent-activation.sh`
 - [ ] `scripts/hooks/log-agent-deactivation.sh`
+- [ ] `scripts/hooks/knowledge-capture.sh` — Knowledge extraction on agent stop
+- [ ] `scripts/knowledge-compile.sh` + `scripts/knowledge-compile-prompt.md` — Knowledge compilation
 
 ### Phase 5: GUI Dashboard (12)
 - [ ] `gui/server.js`
@@ -179,7 +183,7 @@ Which TO-DO doc to read for each component:
   settings.json          ← Hooks + permissions (Phase 1)
   rules/                 ← Governance + autonomy (Phase 1)
   agents/ceo.md, cao.md  ← Agent definitions (Phase 3)
-  skills/                ← 18 skills (Phase 2) + existing user skills
+  skills/                ← 20 skills (Phase 2) + existing user skills
 
 org/                     ← Created by /onboard at runtime, NOT during implementation
   alignment.md, config.md, orgchart.md
@@ -189,7 +193,8 @@ org/                     ← Created by /onboard at runtime, NOT during implemen
 
 scripts/
   heartbeat.sh           ← Multi-phase orchestration (Phase 4)
-  hooks/*.sh             ← 11 hook scripts (Phase 4)
+  hooks/*.sh             ← 12 hook scripts (Phase 4)
+  knowledge-compile.sh   ← Knowledge compilation pipeline (Phase 4)
 
 gui/
   server.js              ← Express server (Phase 5)

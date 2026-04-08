@@ -328,6 +328,7 @@ mkdir -p org/connectors
 mkdir -p org/skills/shared org/skills/agent-specific
 mkdir -p org/agents/alignment-board/memory org/agents/alignment-board/tasks/backlog org/agents/alignment-board/tasks/active org/agents/alignment-board/tasks/done org/agents/alignment-board/inbox org/agents/alignment-board/activity org/agents/alignment-board/reports
 mkdir -p org/board/governance-reports
+mkdir -p org/knowledge/captures/archive org/knowledge/concepts org/knowledge/connections org/knowledge/qa
 ```
 
 ### Step 2.2: Write org/config.md
@@ -583,7 +584,43 @@ See `.claude/system-reference.md` Section 10 for skill library documentation.
 |-------|-------|-----------|------|-------------|
 ```
 
-### Step 2.12: Write CEO Workspace
+### Step 2.12: Write Knowledge Base Seed Files
+
+#### org/knowledge/index.md
+
+```markdown
+# Knowledge Base Index
+
+Last updated: —
+Articles: 0 | Concepts: 0 | Connections: 0 | Q&A: 0
+
+| Article | Summary | Sources | Updated |
+|---------|---------|---------|---------|
+```
+
+#### org/knowledge/log.md
+
+```markdown
+# Knowledge Base — Build Log
+
+Append-only log of all compilation operations.
+
+---
+```
+
+#### org/knowledge/state.json
+
+```json
+{
+  "compiled_captures": {},
+  "total_cost_usd": 0.00,
+  "last_compile": null,
+  "article_count": 0,
+  "compile_count": 0
+}
+```
+
+### Step 2.13: Write CEO Workspace
 
 #### org/agents/ceo/SOUL.md
 
@@ -807,7 +844,7 @@ Execute these steps in order during every heartbeat cycle:
 - CAO will assess hiring needs based on CEO directives
 ```
 
-### Step 2.13: Write CAO Workspace
+### Step 2.14: Write CAO Workspace
 
 #### org/agents/cao/SOUL.md
 
@@ -1046,7 +1083,7 @@ Execute these steps in order during every heartbeat cycle:
 (Updated as hires are made — track what roles were needed and why)
 ```
 
-### Step 2.14: Write Agent Definitions
+### Step 2.15: Write Agent Definitions
 
 #### .claude/agents/ceo.md
 

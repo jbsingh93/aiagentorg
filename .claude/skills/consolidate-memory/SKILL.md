@@ -164,7 +164,7 @@ If `org/knowledge/` exists:
 1. Review all agents' monthly summaries for cross-cutting patterns
 2. Update `org/knowledge/org-wide/lessons-learned.md` with new org-wide learnings
 3. Update department knowledge bases (`org/knowledge/{dept}/`) with department patterns
-4. Check if `org/knowledge/raw/` has uncompiled fragments (captured by the knowledge-capture hook during SubagentStop events)
+4. Check if `org/knowledge/captures/` has uncompiled fragments (captured by the knowledge-capture hook during SubagentStop events)
 5. If uncompiled fragments exist, run `/compile-knowledge` to synthesize raw fragments into the topic files and update `org/knowledge/index.md`
 6. The knowledge-capture hook automatically extracts insights from every agent session — Phase 5 is where those raw captures get integrated into the permanent knowledge base
 

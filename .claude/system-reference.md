@@ -347,7 +347,37 @@ Your INSTRUCTIONS.md may list specific skills assigned to you.
 
 ---
 
-## 11. The Approval System
+## 11. The Org-Wide Knowledge Base
+
+The organisation maintains a shared knowledge base at `org/knowledge/`. This is institutional memory that survives individual agent sessions and benefits the entire org.
+
+### Structure
+```
+org/knowledge/
+├── index.md           # Master catalog of all articles (READ THIS FIRST)
+├── log.md             # Append-only build log
+├── state.json         # Compilation state tracking
+├── concepts/          # Atomic knowledge articles (one topic per file)
+├── connections/       # Cross-cutting insight articles
+├── captures/          # Raw knowledge captures from agent sessions
+│   └── archive/       # Processed captures
+└── qa/                # Previously answered questions
+```
+
+### How It Works
+1. **Automatic capture**: Every time an agent session ends, the `knowledge-capture.sh` hook extracts decisions, learnings, heuristics, and errors into `captures/`.
+2. **Compilation**: Raw captures are compiled into structured articles via `/compile-knowledge` (run by board or CAO). This produces concept articles, connection articles, and updates the index.
+3. **Querying**: Use `/query-knowledge <question>` to search the knowledge base. It reads the index, identifies relevant articles, and synthesizes an answer.
+
+### For Agents
+- **Load the index at startup**: `org/knowledge/index.md` is in your context loading order. Scan it to know what knowledge is available.
+- **Consult before reinventing**: If you're tackling a task that another agent may have solved before, check the knowledge base first.
+- **Your knowledge is captured automatically**: The hook runs on every session end. Focus on doing good work — insights are extracted for you.
+- **Read access**: You can read `org/knowledge/` if it's in your `access_read` list (most agents have this by default).
+
+---
+
+## 12. The Approval System
 
 Some actions require Board (human) approval:
 - Hiring new agents
@@ -359,7 +389,7 @@ These go through `org/board/approvals/`. The Board reviews proposals and approve
 
 ---
 
-## 12. Key Rules
+## 13. Key Rules
 
 1. **All runtime state in `org/` only** — never modify `.claude/agents/` during normal operations
 2. **Communicate via threads** — never write directly to other agents' workspaces (except tasks + inbox notifications)
@@ -374,7 +404,7 @@ These go through `org/board/approvals/`. The Board reviews proposals and approve
 
 ---
 
-## 13. Building External Service Connectors (Dynamic)
+## 14. Building External Service Connectors (Dynamic)
 
 **You are NOT limited to pre-built integrations.** When the organisation needs to connect to an external service (Shopify, Gmail, Stripe, a CRM, social media, ad platforms, ANYTHING), the right approach is to BUILD the connector.
 
@@ -434,7 +464,7 @@ org/connectors/
 
 ---
 
-## 14. Creating Internal Business Systems (Dynamic)
+## 15. Creating Internal Business Systems (Dynamic)
 
 **You can and SHOULD create internal business systems when the organisation needs them.** These are NOT pre-built — you design and build them based on actual business requirements.
 
@@ -478,7 +508,7 @@ In a real company, when the finance team needs a ledger, they don't wait for IT 
 
 ---
 
-## 15. Webhook and Event Systems (Dynamic)
+## 16. Webhook and Event Systems (Dynamic)
 
 **When the organisation needs real-time responses to external events** (new orders, incoming emails, payment notifications), you can BUILD event listeners.
 
@@ -509,7 +539,7 @@ Heartbeat cycles run every 30min–2h. Some events need faster response:
 
 ---
 
-## 16. Financial Management & The Org Wallet
+## 17. Financial Management & The Org Wallet
 
 ### API Cost Budget (Already Exists)
 The existing budget system in `org/budgets/` tracks API costs — what it costs to run agents.
@@ -532,7 +562,7 @@ The organisation may have access to real money for business operations:
 
 ---
 
-## 17. Hiring External Help
+## 18. Hiring External Help
 
 **Some tasks are impossible for AI agents.** When this happens, the organisation can hire humans:
 - Physical tasks (shipping, warehousing, photography)
@@ -558,7 +588,7 @@ The organisation may have access to real money for business operations:
 
 ---
 
-## 18. For the CEO Specifically
+## 19. For the CEO Specifically
 
 As CEO, you additionally need to know:
 - You are the highest-ranking operational agent (you report to the Board)
@@ -574,7 +604,7 @@ As CEO, you additionally need to know:
 
 ---
 
-## 19. For the CAO Specifically
+## 20. For the CAO Specifically
 
 As CAO, you additionally need to know:
 - You CREATE other agents — you write their SOUL.md, IDENTITY.md, INSTRUCTIONS.md, HEARTBEAT.md
@@ -606,7 +636,7 @@ As CAO, you additionally need to know:
 
 ---
 
-## 20. For the Board (Human) Specifically
+## 21. For the Board (Human) Specifically
 
 The Board uses Claude Code directly. Available commands:
 - `/onboard` — create a new organisation

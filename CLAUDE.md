@@ -47,7 +47,7 @@ Shared Org State (Markdown files in org/)
 12. **Alignment Board (Three-Layer Governance)** — Constitutional hooks (always-on enforcement) + Alignment Review Agent (Phase 0 of heartbeat, opus model) + Protected alignment document (immutable core only human can change). The Alignment Board approves/rejects proposals, detects drift, halts violating agents, and acts on behalf of the human. The human's ONLY required task is approving changes to the core alignment (mission, values, ethics).
 13. **org/alignment.md is PROTECTED** — `alignment-protect.sh` hook blocks ALL agent writes. No alternative alignment files can be created. Only the human can edit the constitution.
 14. **Tiered violation response** — Soft (warn + log), Hard (halt agent + revoke tools), Nuclear (halt ALL + notify human).
-15. **Knowledge Base Memory System** — Automatic knowledge capture from every agent session (SubagentStop hook) → raw fragments in `org/knowledge/raw/` → compiled into topic files and searchable index via `/compile-knowledge`. Agents load `org/knowledge/index.md` at startup. `/query-knowledge` for on-demand search.
+15. **Knowledge Base Memory System** — Automatic knowledge capture from every agent session (SubagentStop hook) → raw fragments in `org/knowledge/captures/` → compiled into topic files and searchable index via `/compile-knowledge`. Agents load `org/knowledge/index.md` at startup. `/query-knowledge` for on-demand search.
 
 ## .claude/CLAUDE.md — Agent Initialization Guide
 

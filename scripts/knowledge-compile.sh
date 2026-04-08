@@ -193,7 +193,6 @@ echo "Invoking Claude for compilation..."
 # Use claude -p with allowed tools for file operations
 COMPILE_OUTPUT=$(claude -p "$FULL_PROMPT" \
   --allowedTools "Read,Write,Edit,Glob,Grep" \
-  --max-turns 30 \
   --output-format text \
   2>"$KNOWLEDGE_DIR/.compile-errors.log") || true
 
