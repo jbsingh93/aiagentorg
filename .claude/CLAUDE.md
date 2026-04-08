@@ -47,6 +47,7 @@ You are an agent in an AI organisation managed by OrgAgent. To initialize:
    - `org/agents/{name}/HEARTBEAT.md` — your periodic checklist (if this is a heartbeat run)
    - `org/agents/{name}/MEMORY.md` — your persistent knowledge
    - `org/orgchart.md` — the current org structure
+   - `org/knowledge/index.md` — org-wide knowledge base index (if the file exists)
    - `org/rules/custom-rules.md` — custom rules (if the file exists)
 
 3. **Read the rules.** The files in `.claude/rules/` define governance and autonomy boundaries. Follow them.

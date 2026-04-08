@@ -72,7 +72,8 @@
       { "hooks": [{ "type": "command", "command": "bash scripts/hooks/log-agent-activation.sh" }] }
     ],
     "SubagentStop": [
-      { "hooks": [{ "type": "command", "command": "bash scripts/hooks/log-agent-deactivation.sh" }] }
+      { "hooks": [{ "type": "command", "command": "bash scripts/hooks/log-agent-deactivation.sh" }] },
+      { "hooks": [{ "type": "command", "command": "bash scripts/hooks/knowledge-capture.sh" }] }
     ],
     "Stop": [
       { "hooks": [{ "type": "command", "command": "bash scripts/hooks/require-state-and-communication.sh" }] }
