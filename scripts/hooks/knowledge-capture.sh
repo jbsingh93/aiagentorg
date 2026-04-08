@@ -56,11 +56,10 @@ CONTENT=""
 # --- 1. MEMORY.md: Extract key facts, decisions, heuristics ---
 MEMORY_FILE="$AGENT_DIR/MEMORY.md"
 if [[ -f "$MEMORY_FILE" ]]; then
-  # Extract sections that typically contain high-signal knowledge
-  FACTS=$(awk '/^## Key Facts/,/^## /' "$MEMORY_FILE" | grep '^ *-' | head -10)
-  DECISIONS=$(awk '/^## Strategic Decisions/,/^## /' "$MEMORY_FILE" | grep '^ *-' | grep "$TODAY" | head -5)
-  HEURISTICS=$(awk '/^## Process Heuristics/,/^## /' "$MEMORY_FILE" | grep '^ *-' | head -5)
-  LEARNINGS=$(awk '/^## Learnings/,/^## /' "$MEMORY_FILE" | grep '^ *-' | head -5)
+  # Extract sections using state-based awk (start on header, stop on next header)
+  DECISIONS=$(awk '/^## Strategic Decisions/{f=1; next} /^##/{f=0} f' "$MEMORY_FILE" | grep '^ *-' | grep "$TODAY" | head -5)
+  HEURISTICS=$(awk '/^## Process Heuristics/{f=1; next} /^##/{f=0} f' "$MEMORY_FILE" | grep '^ *-' | head -5)
+  LEARNINGS=$(awk '/^## Learnings/{f=1; next} /^##/{f=0} f' "$MEMORY_FILE" | grep '^ *-' | head -5)
 
   if [[ -n "$DECISIONS" || -n "$LEARNINGS" || -n "$HEURISTICS" ]]; then
     CONTENT="${CONTENT}\n### From MEMORY.md"
@@ -74,9 +73,9 @@ fi
 # --- 2. current-state.md: Extract reasoning traces and active decisions ---
 STATE_FILE="$AGENT_DIR/activity/current-state.md"
 if [[ -f "$STATE_FILE" ]]; then
-  ACTIVE_DECISION=$(awk '/^## Active Decision/,/^## /' "$STATE_FILE" | grep -v '^## ' | head -10)
-  REASONING=$(awk '/^## Reasoning Trace/,/^## /' "$STATE_FILE" | grep -v '^## ' | head -10)
-  COMPLETED=$(awk '/^## Completed This Cycle/,/^## /' "$STATE_FILE" | grep -v '^## ' | head -10)
+  ACTIVE_DECISION=$(awk '/^## Active Decision/{f=1; next} /^##/{f=0} f' "$STATE_FILE" | head -10)
+  REASONING=$(awk '/^## Reasoning Trace/{f=1; next} /^##/{f=0} f' "$STATE_FILE" | head -10)
+  COMPLETED=$(awk '/^## Completed This Cycle/{f=1; next} /^##/{f=0} f' "$STATE_FILE" | head -10)
 
   if [[ -n "$ACTIVE_DECISION" || -n "$REASONING" || -n "$COMPLETED" ]]; then
     CONTENT="${CONTENT}\n### From Current State"
@@ -151,8 +150,8 @@ else
   CURRENT_COUNT=$(grep "capture_count:" "$CAPTURE_FILE" 2>/dev/null | awk '{print $2}')
   CURRENT_COUNT=${CURRENT_COUNT:-0}
   NEW_COUNT=$((CURRENT_COUNT + 1))
-  sed -i "s/capture_count: .*/capture_count: $NEW_COUNT/" "$CAPTURE_FILE" 2>/dev/null
-  sed -i "s/last_capture: .*/last_capture: $TIMESTAMP/" "$CAPTURE_FILE" 2>/dev/null
+  sed -i "s|capture_count: .*|capture_count: $NEW_COUNT|" "$CAPTURE_FILE" 2>/dev/null
+  sed -i "s|last_capture: .*|last_capture: $TIMESTAMP|" "$CAPTURE_FILE" 2>/dev/null
 fi
 
 # Append session content
@@ -191,7 +190,9 @@ fi
 
 # Trigger background compilation if needed (and not already running)
 LOCK_FILE="$ORG_DIR/knowledge/.compile-lock"
-COMPILE_SCRIPT="scripts/knowledge-compile.sh"
+# Resolve compile script path relative to this hook's location
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+COMPILE_SCRIPT="$SCRIPT_DIR/../knowledge-compile.sh"
 
 if [[ "$SHOULD_COMPILE" == "true" && -f "$COMPILE_SCRIPT" && ! -f "$LOCK_FILE" ]]; then
   # Spawn compilation in background — non-blocking
