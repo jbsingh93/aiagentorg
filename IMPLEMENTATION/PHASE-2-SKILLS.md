@@ -1,7 +1,7 @@
-# Phase 2: Skills (16 total)
+# Phase 2: Skills (18 total)
 
-**Objective:** Create all 16 skill SKILL.md files that provide structured workflows.
-**Files to create:** 15 new skills (1 already exists: master-gpt-prompter)
+**Objective:** Create all 18 skill SKILL.md files that provide structured workflows.
+**Files to create:** 17 new skills (1 already exists: master-gpt-prompter)
 **Depends on:** Phase 1 (settings.json must exist for hook references in skills)
 **Estimated effort:** 4-6 hours
 
@@ -275,6 +275,36 @@
 - **DO NOT CREATE OR OVERWRITE** — this skill already exists with the user's configuration
 - **Action:** Confirm it loads when Claude Code starts
 - **Spec reference:** `TO-DO/13-MASTER-PROMPTER-SKILL-SPEC.md` (documents the principles the existing skill embodies)
+
+---
+
+## Task 2.19: `/compile-knowledge` — Knowledge Base Compilation
+
+- [ ] **Create file:** `.claude/skills/compile-knowledge/SKILL.md`
+- **Spec:** `TO-DO/GAPS/to-do/GAP-05-MEMORY-SCALING.md` (knowledge base section)
+- **Key content:**
+  - Triggers `scripts/knowledge-compile.sh` which uses Claude to compile raw captures
+  - Processes uncompiled captures from `org/knowledge/captures/`
+  - Creates concept articles (`org/knowledge/concepts/`) and connection articles (`org/knowledge/connections/`)
+  - Updates master index (`org/knowledge/index.md`)
+  - Supports `--all` flag for full recompilation
+  - Lock protection via `.compile-lock`
+- **Dependencies:** Phase 4 (knowledge-capture.sh hook)
+- **Verify:** Run `/compile-knowledge` — should report nothing to compile if no captures exist
+
+---
+
+## Task 2.20: `/query-knowledge` — Knowledge Base Search
+
+- [ ] **Create file:** `.claude/skills/query-knowledge/SKILL.md`
+- **Spec:** `TO-DO/GAPS/to-do/GAP-05-MEMORY-SCALING.md` (knowledge base section)
+- **Key content:**
+  - Reads knowledge base index, identifies relevant articles (3-10)
+  - Synthesizes answer with citations
+  - `--file-back` option saves answer as Q&A article
+  - Access control: all agents with read access can query, only board/CAO can file back
+- **Dependencies:** Phase 4 (knowledge compilation must have run at least once)
+- **Verify:** Run `/query-knowledge "test question"` — should report empty knowledge base
 
 ---
 

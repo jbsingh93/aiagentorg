@@ -16,7 +16,7 @@ Human (Board) --> Claude Code session (skills + natural language)
        |              |
        |         GUI Dashboard (localhost:3000)
        |
-Governance Layer (11 hooks: access control, audit, budget, routing, state enforcement)
+Governance Layer (12 hooks: access control, audit, budget, routing, state enforcement, knowledge capture)
        |
 Agent Runtime (claude --agent <name> invocations)
   |- CEO (opus) -- strategic leadership, delegation
@@ -47,6 +47,7 @@ Shared Org State (Markdown files in org/)
 12. **Alignment Board (Three-Layer Governance)** — Constitutional hooks (always-on enforcement) + Alignment Review Agent (Phase 0 of heartbeat, opus model) + Protected alignment document (immutable core only human can change). The Alignment Board approves/rejects proposals, detects drift, halts violating agents, and acts on behalf of the human. The human's ONLY required task is approving changes to the core alignment (mission, values, ethics).
 13. **org/alignment.md is PROTECTED** — `alignment-protect.sh` hook blocks ALL agent writes. No alternative alignment files can be created. Only the human can edit the constitution.
 14. **Tiered violation response** — Soft (warn + log), Hard (halt agent + revoke tools), Nuclear (halt ALL + notify human).
+15. **Knowledge Base Memory System** — Automatic knowledge capture from every agent session (SubagentStop hook) → raw fragments in `org/knowledge/captures/` → compiled into topic files and searchable index via `/compile-knowledge`. Agents load `org/knowledge/index.md` at startup. `/query-knowledge` for on-demand search.
 
 ## .claude/CLAUDE.md — Agent Initialization Guide
 
@@ -54,13 +55,13 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 1. You are an agent in an AI organisation. Read your workspace to initialize.
 2. Your workspace: `org/agents/{your-name}/`
 3. Context loading order: SOUL → IDENTITY → INSTRUCTIONS → HEARTBEAT → MEMORY
-4. Shared files: alignment.md, config.md, orgchart.md, custom-rules.md
+4. Shared files: alignment.md, config.md, orgchart.md, knowledge/index.md, custom-rules.md
 5. All prompts follow master-gpt-prompter principles
 6. If you need a tool/data you don't have: create a request
 7. You MUST maintain `activity/current-state.md` — hooks enforce this
 8. You MUST communicate in threads (`org/threads/`) — hooks enforce this
 
-## Skills (20 system skills)
+## Skills (22 system skills)
 
 | Skill | Purpose |
 |-------|---------|
@@ -84,8 +85,10 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | cancel-org | Stop the continuous loop cleanly |
 | browser | Browser automation via Playwright MCP/CLI (privileged tool) |
 | create-skill | Create custom skills for the org skill library |
+| compile-knowledge | Compile raw knowledge fragments into topic files and searchable index |
+| query-knowledge | Search the org knowledge base by topic, agent, department, or keyword |
 
-## Hooks (11 total)
+## Hooks (12 total)
 
 | Hook | Event | Purpose |
 |------|-------|---------|
@@ -100,6 +103,7 @@ The `.claude/CLAUDE.md` is a universal initialization guide (NOT board alignment
 | budget-check.sh | PostToolUse (tasks) | Budget enforcement |
 | log-agent-activation.sh | SubagentStart | Log agent session start |
 | log-agent-deactivation.sh | SubagentStop | Log agent session end |
+| knowledge-capture.sh | SubagentStop | Extract knowledge fragments from agent sessions |
 
 ## Reference Documents (TO-DO/)
 

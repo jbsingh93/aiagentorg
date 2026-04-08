@@ -1,7 +1,7 @@
-# Phase 4: Scripts — Heartbeat + 11 Hook Scripts
+# Phase 4: Scripts — Heartbeat + 13 Hook/Compile Scripts
 
-**Objective:** Create the heartbeat orchestration script and all governance/observability hook scripts.
-**Files to create:** 12
+**Objective:** Create the heartbeat orchestration script, all governance/observability hook scripts, and the knowledge compilation pipeline.
+**Files to create:** 14
 **Depends on:** Phase 1 (settings.json references these scripts)
 **Can run in parallel with:** Phase 2 and Phase 3
 **Estimated effort:** 3-4 hours
@@ -189,6 +189,46 @@
 
 ---
 
+## Task 4.13: `scripts/hooks/knowledge-capture.sh` — Knowledge Extraction on Agent Stop
+
+- [ ] **Create file:** `scripts/hooks/knowledge-capture.sh`
+- **Spec:** `TO-DO/GAPS/to-do/GAP-05-MEMORY-SCALING.md` (knowledge base section), `CLAUDE.md` (cross-cutting concern #15)
+- **Key content:**
+  - Fires on SubagentStop (registered in settings.json alongside log-agent-deactivation.sh)
+  - Reads agent's MEMORY.md, current-state.md, today's threads, and completed tasks
+  - Extracts decisions, learnings, heuristics, and errors
+  - Writes capture files to `org/knowledge/captures/YYYY-MM-DD-{agent}.md`
+  - Triggers background compilation when capture threshold reached or at end-of-day
+  - Skips alignment-board agent (governance only)
+  - Pure file I/O — no LLM calls, runs in <2 seconds
+  - **MUST exit 0 always** — capture failures must not block agent stop
+- **Dependencies:** None
+- **Verify:** Create a mock capture and verify the file format
+
+---
+
+## Task 4.14: `scripts/knowledge-compile.sh` + `scripts/knowledge-compile-prompt.md` — Knowledge Compilation Pipeline
+
+- [ ] **Create file:** `scripts/knowledge-compile.sh`
+- [ ] **Create file:** `scripts/knowledge-compile-prompt.md`
+- **Spec:** `TO-DO/GAPS/to-do/GAP-05-MEMORY-SCALING.md` (knowledge base section)
+- **Key content (compile script):**
+  - Lock management (`.compile-lock`) with stale lock detection (10 min timeout)
+  - Finds uncompiled captures, checks SHA-256 hashes for dedup
+  - Invokes `claude -p` with compile prompt + captures + existing articles
+  - Marks captures as compiled, updates state.json
+  - Cross-platform: supports sha256sum (Linux) and shasum (macOS)
+- **Key content (prompt template):**
+  - Instructions for extracting concept articles and connection articles
+  - Article schema with YAML frontmatter
+  - Index update format
+  - Quality standards (3-5 key points, 2+ paragraphs, citations)
+  - Incremental: updates existing articles rather than duplicating
+- **Dependencies:** Claude CLI available
+- **Verify:** `bash -n scripts/knowledge-compile.sh` passes syntax check
+
+---
+
 ## Phase 4 Verification
 
 ```bash
@@ -197,15 +237,19 @@ echo "--- heartbeat ---"
 [ -f scripts/heartbeat.sh ] && echo "OK" || echo "MISSING"
 
 echo "--- hooks ---"
-for hook in activity-logger remind-state-update require-state-and-communication data-access-check message-routing-check require-board-approval require-cao-or-board skill-access-check budget-check log-agent-activation log-agent-deactivation; do
+for hook in activity-logger remind-state-update require-state-and-communication data-access-check message-routing-check require-board-approval require-cao-or-board skill-access-check budget-check log-agent-activation log-agent-deactivation knowledge-capture; do
   [ -f "scripts/hooks/$hook.sh" ] && echo "OK: $hook" || echo "MISSING: $hook"
 done
 
+echo "--- compile scripts ---"
+[ -f scripts/knowledge-compile.sh ] && echo "OK: knowledge-compile.sh" || echo "MISSING: knowledge-compile.sh"
+[ -f scripts/knowledge-compile-prompt.md ] && echo "OK: knowledge-compile-prompt.md" || echo "MISSING: knowledge-compile-prompt.md"
+
 # All scripts are valid bash (syntax check)
-for f in scripts/heartbeat.sh scripts/hooks/*.sh; do
+for f in scripts/heartbeat.sh scripts/hooks/*.sh scripts/knowledge-compile.sh; do
   bash -n "$f" && echo "SYNTAX OK: $f" || echo "SYNTAX ERROR: $f"
 done
 
-# Total: 12 scripts
-echo "Total scripts: $(ls -1 scripts/heartbeat.sh scripts/hooks/*.sh 2>/dev/null | wc -l)"
+# Total: 14 scripts/files
+echo "Total scripts: $(ls -1 scripts/heartbeat.sh scripts/hooks/*.sh scripts/knowledge-compile.sh scripts/knowledge-compile-prompt.md 2>/dev/null | wc -l)"
 ```
