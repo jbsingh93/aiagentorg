@@ -27,7 +27,9 @@ INDEX_FILE="$KNOWLEDGE_DIR/index.md"
 LOG_FILE="$KNOWLEDGE_DIR/log.md"
 STATE_FILE="$KNOWLEDGE_DIR/state.json"
 LOCK_FILE="$KNOWLEDGE_DIR/.compile-lock"
-PROMPT_TEMPLATE="scripts/knowledge-compile-prompt.md"
+# Resolve prompt template path relative to this script's location
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROMPT_TEMPLATE="$SCRIPT_DIR/knowledge-compile-prompt.md"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S")
 TODAY=$(date +%Y-%m-%d)
 
@@ -35,19 +37,19 @@ TODAY=$(date +%Y-%m-%d)
 acquire_lock() {
   if [[ -f "$LOCK_FILE" ]]; then
     # Check if lock is stale (older than 10 minutes)
-    if command -v stat &>/dev/null; then
-      LOCK_AGE=$(stat -c %Y "$LOCK_FILE" 2>/dev/null || stat -f %m "$LOCK_FILE" 2>/dev/null || echo "0")
-      NOW=$(date +%s)
-      DIFF=$((NOW - LOCK_AGE))
-      if [[ $DIFF -lt 600 ]]; then
-        echo "Compilation already in progress (lock acquired ${DIFF}s ago). Exiting."
-        exit 0
-      fi
-      echo "Stale lock detected (${DIFF}s old). Removing and proceeding."
-    else
-      echo "Lock file exists. Exiting."
+    LOCK_AGE=0
+    NOW=$(date +%s)
+    # GNU stat uses -c, macOS/BSD stat uses -f
+    LOCK_MTIME=$(stat -c %Y "$LOCK_FILE" 2>/dev/null) || \
+    LOCK_MTIME=$(stat -f %m "$LOCK_FILE" 2>/dev/null) || \
+    LOCK_MTIME="0"
+    LOCK_AGE=$((NOW - LOCK_MTIME))
+    if [[ $LOCK_AGE -lt 600 ]]; then
+      echo "Compilation already in progress (lock acquired ${LOCK_AGE}s ago). Exiting."
       exit 0
     fi
+    echo "Stale lock detected (${LOCK_AGE}s old). Removing and proceeding."
+    rm -f "$LOCK_FILE"
   fi
   echo "$$" > "$LOCK_FILE"
 }
@@ -59,15 +61,21 @@ release_lock() {
 # Clean up lock on exit (success or failure)
 trap release_lock EXIT
 
-# === Hash function (cross-platform) ===
+# === Hash function (cross-platform, consistent algorithm) ===
+# Detect hash command once, reuse for all calls to avoid algorithm mismatch
+if command -v sha256sum &>/dev/null; then
+  _HASH_CMD="sha256sum"
+elif command -v shasum &>/dev/null; then
+  _HASH_CMD="shasum -a 256"
+else
+  _HASH_CMD=""
+fi
+
 file_hash() {
-  if command -v sha256sum &>/dev/null; then
-    sha256sum "$1" | cut -c1-16
-  elif command -v shasum &>/dev/null; then
-    shasum -a 256 "$1" | cut -c1-16
+  if [[ -n "$_HASH_CMD" ]]; then
+    $_HASH_CMD "$1" | cut -c1-16
   else
-    # Fallback: use md5
-    md5sum "$1" 2>/dev/null | cut -c1-16 || echo "nohash"
+    echo "nohash"
   fi
 }
 
@@ -208,21 +216,31 @@ for CAP in "${TO_COMPILE[@]}"; do
   CURRENT_HASH=$(file_hash "$CAP")
 
   # Update state.json with this capture's hash
-  TEMP_STATE=$(mktemp)
-  jq --arg name "$CAP_NAME" \
-     --arg hash "$CURRENT_HASH" \
-     --arg time "$TIMESTAMP" \
-     '.compiled_captures[$name] = {"hash": $hash, "compiled_at": $time}' \
-     "$STATE_FILE" > "$TEMP_STATE" && mv "$TEMP_STATE" "$STATE_FILE"
+  TEMP_STATE=$(mktemp) || { echo "ERROR: mktemp failed"; continue; }
+  if jq --arg name "$CAP_NAME" \
+        --arg hash "$CURRENT_HASH" \
+        --arg time "$TIMESTAMP" \
+        '.compiled_captures[$name] = {"hash": $hash, "compiled_at": $time}' \
+        "$STATE_FILE" > "$TEMP_STATE"; then
+    mv "$TEMP_STATE" "$STATE_FILE"
+  else
+    echo "WARNING: jq failed updating state for $CAP_NAME"
+    rm -f "$TEMP_STATE"
+  fi
 done
 
 # Update compile count and timestamp
 ARTICLE_COUNT=$(find "$CONCEPTS_DIR" "$CONNECTIONS_DIR" "$QA_DIR" -name "*.md" 2>/dev/null | wc -l)
-TEMP_STATE=$(mktemp)
-jq --arg time "$TIMESTAMP" \
-   --argjson count "$ARTICLE_COUNT" \
-   '.last_compile = $time | .article_count = $count | .compile_count += 1' \
-   "$STATE_FILE" > "$TEMP_STATE" && mv "$TEMP_STATE" "$STATE_FILE"
+TEMP_STATE=$(mktemp) || { echo "ERROR: mktemp failed"; exit 1; }
+if jq --arg time "$TIMESTAMP" \
+      --argjson count "$ARTICLE_COUNT" \
+      '.last_compile = $time | .article_count = $count | .compile_count += 1' \
+      "$STATE_FILE" > "$TEMP_STATE"; then
+  mv "$TEMP_STATE" "$STATE_FILE"
+else
+  echo "WARNING: jq failed updating compile count"
+  rm -f "$TEMP_STATE"
+fi
 
 # Append to build log
 echo "" >> "$LOG_FILE"
