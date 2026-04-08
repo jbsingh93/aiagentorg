@@ -366,11 +366,23 @@ org/knowledge/
 
 ### How It Works
 1. **Automatic capture**: Every time an agent session ends, the `knowledge-capture.sh` hook extracts decisions, learnings, heuristics, and errors into `captures/`.
-2. **Compilation**: Raw captures are compiled into structured articles via `/compile-knowledge` (run by board or CAO). This produces concept articles, connection articles, and updates the index.
-3. **Querying**: Use `/query-knowledge <question>` to search the knowledge base. It reads the index, identifies relevant articles, and synthesizes an answer.
+2. **Compilation**: Raw captures are compiled into structured articles via `/compile-knowledge` (run by board or CAO). Each article gets: `keywords` (5-10 search terms), `description` (<200 chars), `Table of Contents` (annotated sections), and named topical sections.
+3. **Querying**: Use `/query-knowledge <question>` which uses 3-tier progressive disclosure to find answers efficiently.
+
+### 3-Tier Progressive Disclosure (How to Search)
+Articles are designed for efficient retrieval — scan cheap metadata before reading expensive content:
+
+| Tier | What You Read | Cost | When |
+|------|--------------|------|------|
+| **1. Index** | Title + Keywords + Description in `index.md` | ~100 tokens/article | Always — scan to shortlist candidates |
+| **2. TOC** | First 25-30 lines of an article (frontmatter + Table of Contents) | ~30-50 tokens | Candidates only — confirm relevance |
+| **3. Full** | Complete article content | Full article | Confirmed matches only |
+
+**For quick lookups**: Use `Grep "keyword" org/knowledge/index.md` to find articles by keyword without reading the whole index.
 
 ### For Agents
-- **Load the index at startup**: `org/knowledge/index.md` is in your context loading order. Scan it to know what knowledge is available.
+- **Load the index at startup**: `org/knowledge/index.md` is in your context loading order. Scan the Keywords and Description columns to know what knowledge is available.
+- **Use the 3-tier approach**: Don't read full articles blindly. Scan index keywords first, read TOC to confirm, then read full content.
 - **Consult before reinventing**: If you're tackling a task that another agent may have solved before, check the knowledge base first.
 - **Your knowledge is captured automatically**: The hook runs on every session end. Focus on doing good work — insights are extracted for you.
 - **Read access**: You can read `org/knowledge/` if it's in your `access_read` list (most agents have this by default).

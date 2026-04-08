@@ -594,8 +594,20 @@ See `.claude/system-reference.md` Section 10 for skill library documentation.
 Last updated: —
 Articles: 0 | Concepts: 0 | Connections: 0 | Q&A: 0
 
-| Article | Summary | Sources | Updated |
-|---------|---------|---------|---------|
+## Concepts
+
+| Title | Keywords | Description | Dept | Updated |
+|-------|----------|-------------|------|---------|
+
+## Connections
+
+| Title | Keywords | Description | Connects | Updated |
+|-------|----------|-------------|----------|---------|
+
+## Q&A
+
+| Title | Keywords | Description | Filed |
+|-------|----------|-------------|-------|
 ```
 
 #### org/knowledge/log.md

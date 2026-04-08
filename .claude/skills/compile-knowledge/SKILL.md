@@ -1,6 +1,6 @@
 ---
 name: compile-knowledge
-description: "Compile knowledge captures into structured, indexed knowledge articles. Processes raw agent session captures from org/knowledge/captures/ into atomic concept articles and cross-cutting connection articles. Can be triggered manually or runs automatically via hook."
+description: "Compile knowledge captures into structured, indexed knowledge articles with progressive disclosure metadata (keywords, descriptions, TOC). Processes raw agent session captures from org/knowledge/captures/ into atomic concept articles and cross-cutting connection articles. Can be triggered manually or runs automatically via hook."
 disable-model-invocation: true
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
@@ -23,10 +23,13 @@ This skill triggers compilation of raw knowledge captures into structured, index
 2. Checks SHA-256 hashes to skip captures that haven't changed since last compile
 3. Invokes `scripts/knowledge-compile.sh` which uses Claude to:
    - Extract 2-5 key concepts per capture into atomic articles (`org/knowledge/concepts/`)
+   - Each article includes: `keywords` (5-10 search terms), `description` (<200 chars), `## Table of Contents` (annotated sections), and named topical sections
    - Create connection articles for cross-cutting insights (`org/knowledge/connections/`)
-   - Update the master index (`org/knowledge/index.md`)
+   - Update the master index (`org/knowledge/index.md`) with Keywords, Description, and Dept columns for 3-tier progressive disclosure
    - Append to the build log (`org/knowledge/log.md`)
 4. Marks captures as compiled and updates `org/knowledge/state.json`
+
+**Article format**: Articles are structured for 3-tier progressive disclosure — agents scan index metadata (Tier 1), read article TOC (Tier 2), then read full content (Tier 3). See `scripts/knowledge-compile-prompt.md` for the full schema.
 
 ## Execution
 
