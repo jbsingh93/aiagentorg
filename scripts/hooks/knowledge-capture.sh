@@ -146,12 +146,13 @@ compiled: false
 # Knowledge Capture — $AGENT — $TODAY
 HEADER
 else
-  # Increment capture count in existing file
+  # Increment capture count and reset compiled flag (new content needs compilation)
   CURRENT_COUNT=$(grep "capture_count:" "$CAPTURE_FILE" 2>/dev/null | awk '{print $2}')
   CURRENT_COUNT=${CURRENT_COUNT:-0}
   NEW_COUNT=$((CURRENT_COUNT + 1))
   sed -i "s|capture_count: .*|capture_count: $NEW_COUNT|" "$CAPTURE_FILE" 2>/dev/null
   sed -i "s|last_capture: .*|last_capture: $TIMESTAMP|" "$CAPTURE_FILE" 2>/dev/null
+  sed -i "s|compiled: true|compiled: false|" "$CAPTURE_FILE" 2>/dev/null
 fi
 
 # Append session content
@@ -184,7 +185,7 @@ SHOULD_COMPILE=false
 if [[ "$UNCOMPILED_COUNT" -ge "$COMPILE_THRESHOLD" ]]; then
   SHOULD_COMPILE=true
 fi
-if [[ "$HOUR" -ge "$COMPILE_HOUR" && "$UNCOMPILED_COUNT" -gt 0 ]]; then
+if [[ "10#$HOUR" -ge "10#$COMPILE_HOUR" && "$UNCOMPILED_COUNT" -gt 0 ]]; then
   SHOULD_COMPILE=true
 fi
 

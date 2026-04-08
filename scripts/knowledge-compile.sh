@@ -55,7 +55,11 @@ acquire_lock() {
 }
 
 release_lock() {
-  rm -f "$LOCK_FILE"
+  # Only delete the lock if this process owns it (prevents concurrent process B
+  # from deleting process A's lock when B exits after failing to acquire)
+  if [[ -f "$LOCK_FILE" ]] && [[ "$(cat "$LOCK_FILE" 2>/dev/null)" == "$$" ]]; then
+    rm -f "$LOCK_FILE"
+  fi
 }
 
 # Clean up lock on exit (success or failure)
@@ -199,18 +203,25 @@ ${CAPTURE_CONTENT}
 echo "Invoking Claude for compilation..."
 
 # Use claude -p with allowed tools for file operations
+COMPILE_EXIT=0
 COMPILE_OUTPUT=$(claude -p "$FULL_PROMPT" \
   --allowedTools "Read,Write,Edit,Glob,Grep" \
   --output-format text \
-  2>"$KNOWLEDGE_DIR/.compile-errors.log") || true
+  2>"$KNOWLEDGE_DIR/.compile-errors.log") || COMPILE_EXIT=$?
+
+if [[ $COMPILE_EXIT -ne 0 ]]; then
+  echo "ERROR: Claude compilation failed (exit $COMPILE_EXIT). Captures NOT marked as compiled."
+  echo "Check $KNOWLEDGE_DIR/.compile-errors.log for details."
+  exit 1
+fi
 
 echo "Claude compilation finished."
 
 # === Post-compilation: update state ===
 
-# Mark captures as compiled
+# Mark captures as compiled (only in YAML frontmatter, not body text)
 for CAP in "${TO_COMPILE[@]}"; do
-  sed -i 's/compiled: false/compiled: true/' "$CAP" 2>/dev/null
+  sed -i '1,/^---$/{ s/compiled: false/compiled: true/; }' "$CAP" 2>/dev/null
 
   CAP_NAME=$(basename "$CAP")
   CURRENT_HASH=$(file_hash "$CAP")
